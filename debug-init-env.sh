@@ -15,7 +15,13 @@
 # limitations under the License.
 #
 
+DATADIR=data
+
 echo -n "Pre-creating log..."
-TEMPDIR=data
-touch $TEMPDIR/easy-manage-curation-work.log
+touch $DATADIR/easy-manage-curation-work.log
+
+echo "Copy test input into $DATADIR..."
+cp -r src/test/resources/easy-common-curation-area ${DATADIR}/easy-common-curation-area
+cp -r src/test/resources/datamanager-curation-areas ${DATADIR}/datamanager-curation-areas
+
 echo "OK"

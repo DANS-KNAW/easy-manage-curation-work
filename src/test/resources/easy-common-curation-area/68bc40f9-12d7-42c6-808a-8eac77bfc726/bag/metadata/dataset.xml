@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ddm:DDM
+        xmlns:id-type="http://easy.dans.knaw.nl/schemas/vocab/identifier-type/" xmlns:dcx-dai="http://easy.dans.knaw.nl/schemas/dcx/dai/"
+        xmlns:dcterms="http://purl.org/dc/terms/"
+        xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:ddm="http://easy.dans.knaw.nl/schemas/md/ddm/" xsi:schemaLocation="http://easy.dans.knaw.nl/schemas/md/ddm/ https://easy.dans.knaw.nl/schemas/md/ddm/ddm.xsd">
+    <ddm:profile>
+        <dc:title>Hubble ruimtetelescoop</dc:title>
+        <dc:title>Hubble space telescope</dc:title>
+        <dcterms:description>
+            De Hubble-ruimtetelescoop (Hubble Space Telescope, HST) bestaat uit een aantal precisie-instrumenten voor astronomische waarnemingen. Hij is genoemd naar de Amerikaanse astronoom Edwin Hubble, en draait sinds de lancering door de NASA op 24 april 1990 als een kunstmaan rond de aarde.
+        </dcterms:description>
+        <dcterms:description>
+            The Hubble Space Telescope (HST) is a space telescope that was launched into low Earth orbit in 1990, and remains in operation. With a 2.4-meter (7.9 ft) mirror, Hubble's four main instruments observe in the near ultraviolet, visible, and near infrared spectra. The telescope is named after the astronomer Edwin Hubble.
+        </dcterms:description>
+        <dcx-dai:creatorDetails>
+            <dcx-dai:author>
+                <dcx-dai:titles>Dr</dcx-dai:titles>
+                <dcx-dai:initials>C</dcx-dai:initials>
+                <dcx-dai:surname>Sagan</dcx-dai:surname>
+                <dcx-dai:role>RightsHolder</dcx-dai:role>
+                <dcx-dai:organization>
+                    <dcx-dai:name xml:lang="en">Cornell University</dcx-dai:name>
+                </dcx-dai:organization>
+            </dcx-dai:author>
+        </dcx-dai:creatorDetails>
+        <dcx-dai:creatorDetails>
+            <dcx-dai:author>
+                <dcx-dai:initials>A.W.M.</dcx-dai:initials>
+                <dcx-dai:insertions>van</dcx-dai:insertions>
+                <dcx-dai:surname>tseeH</dcx-dai:surname>
+                <dcx-dai:role>ProjectManager</dcx-dai:role>
+                <dcx-dai:DAI>info:eu-repo/dai/nl/012345678</dcx-dai:DAI>
+                <dcx-dai:organization>
+                    <dcx-dai:name xml:lang="en">WANK/SNAD</dcx-dai:name>
+                </dcx-dai:organization>
+            </dcx-dai:author>
+        </dcx-dai:creatorDetails>
+        <ddm:created>2015-05-13</ddm:created>
+        <ddm:available>2017-04-17</ddm:available>
+        <ddm:audience>D30000</ddm:audience>
+        <ddm:accessRights>OPEN_ACCESS</ddm:accessRights>
+    </ddm:profile>
+    <ddm:dcmiMetadata>
+        <dcterms:type xsi:type="dcterms:DCMIType">Dataset</dcterms:type>
+        <dc:format xsi:type="dcterms:IMT">image/jpeg</dc:format>
+        <dc:format xsi:type="dcterms:IMT">text/plain</dc:format>
+        <dc:identifier>ds2</dc:identifier>
+        <dc:identifier xsi:type="id-type:ISSN">0925-6229</dc:identifier>
+        <dc:source>http://scholar.google.com</dc:source>
+        <dc:language xsi:type="dcterms:ISO639-2">day</dc:language>
+        <dc:language xsi:type="dcterms:ISO639-2">dut</dc:language>
+        <dcterms:rightsHolder>paul</dcterms:rightsHolder>
+        <dcterms:rightsHolder>henk</dcterms:rightsHolder>
+        <dcterms:rightsHolder>richard</dcterms:rightsHolder>
+        <dcterms:rightsHolder>joke</dcterms:rightsHolder>
+        <dcterms:rightsHolder>vesa</dcterms:rightsHolder>
+        <ddm:isVersionOf href="barbapappa">context</ddm:isVersionOf>
+        <dcterms:dateAccepted>2017-08-01</dcterms:dateAccepted>
+        <dc:date>random text</dc:date>
+        <dcterms:dateCopyrighted>2017-08-02</dcterms:dateCopyrighted>
+        <dc:subject>astronomie</dc:subject>
+        <dc:subject>telescopen</dc:subject>
+        <dcterms:temporal>2015-2016</dcterms:temporal>
+    </ddm:dcmiMetadata>
+</ddm:DDM>

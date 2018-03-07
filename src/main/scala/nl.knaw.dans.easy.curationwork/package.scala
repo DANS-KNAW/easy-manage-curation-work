@@ -17,4 +17,9 @@ package nl.knaw.dans.easy
 
 package object curationwork {
 
+  type Deposits = Seq[Deposit]
+  type BagId = String
+  type DepositorId = String
+  type DatamanagerId = String
+
 }

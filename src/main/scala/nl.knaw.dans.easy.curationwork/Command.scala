@@ -19,7 +19,6 @@ import java.nio.file.Paths
 
 import nl.knaw.dans.lib.error._
 import nl.knaw.dans.lib.logging.DebugEnhancedLogging
-import resource._
 
 import scala.language.reflectiveCalls
 import scala.util.control.NonFatal
@@ -35,15 +34,27 @@ object Command extends App with DebugEnhancedLogging {
   val app = new EasyManageCurationWorkApp(configuration)
 
   runSubcommand(app)
-    .doIfSuccess(msg => println(s"OK: $msg"))
+    .doIfSuccess(msg => println(s"$msg"))
     .doIfFailure { case e => logger.error(e.getMessage, e) }
     .doIfFailure { case NonFatal(e) => println(s"FAILED: ${ e.getMessage }") }
 
   private def runSubcommand(app: EasyManageCurationWorkApp): Try[FeedBackMessage] = {
     commandLine.subcommand
       .collect {
-        case cmd @ commandLine.list => Success("Message") // handle list
+        case cmd @ commandLine.list =>
+          if (validDatamanager(cmd.datamanager.toOption)) app.listCurationWork(cmd.datamanager.toOption)
+          else Try("Error: Unknown datamanager")
+        case cmd @ commandLine.assign =>
+          if (validDatamanager(cmd.datamanager.toOption)) app.assignCurationWork(cmd.datamanager.toOption, cmd.uuid.toOption)
+          else Try("Error: Unknown datamanager")
+        case cmd @ commandLine.unassign =>
+          if (validDatamanager(cmd.datamanager.toOption)) app.unassignCurationWork(cmd.datamanager.toOption, cmd.uuid.toOption)
+          else Try("Error: Unknown datamanager")
       }
       .getOrElse(Failure(new IllegalArgumentException(s"Unknown command: ${ commandLine.subcommand }")))
+  }
+
+  private def validDatamanager(datamanager: Option[DatamanagerId]): Boolean = {
+    datamanager.isEmpty || configuration.properties.containsKey(datamanager.getOrElse(""))
   }
 }
