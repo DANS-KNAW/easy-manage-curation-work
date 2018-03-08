@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ddm:DDM
+        xmlns:dcx-dai="http://easy.dans.knaw.nl/schemas/dcx/dai/"
+        xmlns:dcterms="http://purl.org/dc/terms/"
+        xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:ddm="http://easy.dans.knaw.nl/schemas/md/ddm/" xsi:schemaLocation="http://easy.dans.knaw.nl/schemas/md/ddm/ https://easy.dans.knaw.nl/schemas/md/ddm/ddm.xsd">
+    <ddm:profile>
+        <dc:title>Title for empty dataset</dc:title>
+        <dcterms:description>This is an entry for a dataset with no data in it</dcterms:description>
+        <dcx-dai:creatorDetails>
+            <dcx-dai:author>
+                <dcx-dai:initials>Donald</dcx-dai:initials>
+                <dcx-dai:surname>Duck</dcx-dai:surname>
+                <dcx-dai:organization>
+                    <dcx-dai:name xml:lang="en">Duckstad</dcx-dai:name>
+                </dcx-dai:organization>
+            </dcx-dai:author>
+        </dcx-dai:creatorDetails>
+        <ddm:created>2016-07-30</ddm:created>
+        <ddm:available>2017-04-17</ddm:available>
+        <ddm:audience>D37000</ddm:audience>
+        <ddm:accessRights>GROUP_ACCESS</ddm:accessRights>
+    </ddm:profile>
+    <ddm:dcmiMetadata>
+        <dcterms:type xsi:type="dcterms:DCMIType">Dataset</dcterms:type>
+        <dcterms:rightsHolder>unknown person</dcterms:rightsHolder>
+        <dc:subject>empty space</dc:subject>
+    </ddm:dcmiMetadata>
+</ddm:DDM>

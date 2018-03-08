@@ -1,4 +1,4 @@
-Payload-Oxum: 383905.4
-Bagging-Date: 2017-04-17
-Bag-Size: 374.9 KB
-Created: 2015-05-13T00:00:00.000+02:00
+Payload-Oxum: 68105.3
+Bagging-Date: 2017-06-19
+Bag-Size: 66.5 KB
+Created: 2016-07-31T00:00:00.000+02:00

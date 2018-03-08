@@ -22,7 +22,7 @@ import org.scalatest._
 
 class ReadmeSpec extends FlatSpec with Matchers with CustomMatchers {
 
-  private val clo = new CommandLineOptions(Array[String](), Configuration(Paths.get("src/main/assembly/dist"))) {
+  private val clo = new CommandLineOptions(Array[String](), Configuration(Paths.get("src/main/assembly/dist"), "application.properties")) {
     // avoids System.exit() in case of invalid arguments or "--help"
     override def verify(): Unit = {}
   }
