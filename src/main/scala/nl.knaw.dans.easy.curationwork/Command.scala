@@ -27,11 +27,12 @@ import scala.util.{ Failure, Success, Try }
 object Command extends App with DebugEnhancedLogging {
   type FeedBackMessage = String
 
-  val configuration = Configuration(Paths.get(System.getProperty("app.home")))
+  val configuration = Configuration(Paths.get(System.getProperty("app.home")), "application.properties")
+  val cfgDatamanagers = Configuration(Paths.get(System.getProperty("app.home")), "datamanager.properties")
   val commandLine: CommandLineOptions = new CommandLineOptions(args, configuration) {
     verify()
   }
-  val app = new EasyManageCurationWorkApp(configuration)
+  val app = new EasyManageCurationWorkApp(configuration, cfgDatamanagers)
 
   runSubcommand(app)
     .doIfSuccess(msg => println(s"$msg"))
@@ -43,18 +44,18 @@ object Command extends App with DebugEnhancedLogging {
       .collect {
         case cmd @ commandLine.list =>
           if (validDatamanager(cmd.datamanager.toOption)) app.listCurationWork(cmd.datamanager.toOption)
-          else Try("Error: Unknown datamanager")
+          else Try(s"Error: Unknown datamanager ${cmd.datamanager.apply()}")
         case cmd @ commandLine.assign =>
           if (validDatamanager(cmd.datamanager.toOption)) app.assignCurationWork(cmd.datamanager.toOption, cmd.uuid.toOption)
-          else Try("Error: Unknown datamanager")
+          else Try(s"Error: Unknown datamanager ${cmd.datamanager.apply()}")
         case cmd @ commandLine.unassign =>
           if (validDatamanager(cmd.datamanager.toOption)) app.unassignCurationWork(cmd.datamanager.toOption, cmd.uuid.toOption)
-          else Try("Error: Unknown datamanager")
+          else Try(s"Error: Unknown datamanager ${cmd.datamanager.apply()}")
       }
       .getOrElse(Failure(new IllegalArgumentException(s"Unknown command: ${ commandLine.subcommand }")))
   }
 
   private def validDatamanager(datamanager: Option[DatamanagerId]): Boolean = {
-    datamanager.isEmpty || configuration.properties.containsKey(datamanager.getOrElse(""))
+    datamanager.isEmpty || cfgDatamanagers.properties.containsKey(datamanager.getOrElse(""))
   }
 }

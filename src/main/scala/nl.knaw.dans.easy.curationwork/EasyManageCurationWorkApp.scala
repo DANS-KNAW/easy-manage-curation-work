@@ -15,26 +15,24 @@
  */
 package nl.knaw.dans.easy.curationwork
 
-import java.io.File
 import java.nio.file.{Files, Path, Paths}
 
 import sys.process._
 import org.apache.commons.configuration.PropertiesConfiguration
 import nl.knaw.dans.lib.logging.DebugEnhancedLogging
-import resource.{Using, managed}
+import resource.managed
 import org.apache.commons.csv.CSVFormat
 import org.apache.commons.io.FileUtils
 
 import scala.annotation.tailrec
 import scala.collection.JavaConverters._
-import scala.io.{Source, StdIn}
+import scala.io.StdIn
 import scala.language.postfixOps
-import scala.util.control.NonFatal
-import scala.util.{Failure, Try}
+import scala.util.Try
 import scala.xml.XML
 
 
-class EasyManageCurationWorkApp(configuration: Configuration) extends DebugEnhancedLogging {
+class EasyManageCurationWorkApp(configuration: Configuration, cfgDatamanagers: Configuration) extends DebugEnhancedLogging {
 
   private val commonCurationDir = Paths.get(configuration.properties.getString("curation.common.directory"))
   private val managerCurationDirString = configuration.properties.getString("curation.personal.directory")
@@ -59,7 +57,7 @@ class EasyManageCurationWorkApp(configuration: Configuration) extends DebugEnhan
   private def depositsFromCurationArea(deposits: List[Path]): Deposits = {
     deposits.filter(Files.isDirectory(_))
       .flatMap { depositDirPath =>
-        debug(s"Getting info from $depositDirPath")
+//        debug(s"Getting info from $depositDirPath")
         val depositProperties = new PropertiesConfiguration(depositDirPath.resolve("deposit.properties").toFile)
         val depositorId = depositProperties.getString("depositor.userId")
         val submitted = depositProperties.getString("state.label") == "SUBMITTED"
@@ -121,8 +119,9 @@ class EasyManageCurationWorkApp(configuration: Configuration) extends DebugEnhan
     if (directoryExists(personalCurationDirectory.resolve(uuid))) {
       s"\nError: Deposit $uuid already exists in the personal curation area of datamanager $datamanager."
     } else {
+      val depositProperties = new PropertiesConfiguration(commonCurationDir.resolve(uuid).resolve("deposit.properties").toFile)
+      setProperties(depositProperties, datamanager)
       FileUtils.moveDirectory(commonCurationDir.resolve(uuid).toFile, personalCurationDirectory.resolve(uuid).toFile)
-      //    Files.move(commonCurationDir.resolve(uuid), personalCurationDirectory.resolve(uuid))
       s"\nDeposit $uuid has been assigned to datamanager $datamanager."
     }
   }
@@ -149,8 +148,7 @@ class EasyManageCurationWorkApp(configuration: Configuration) extends DebugEnhan
   }
 
   private def unassignDeposit(deposit: Path, datamanager: DatamanagerId): String = {
-    val propFile = deposit.resolve("deposit.properties").toFile
-    val depositProperties = new PropertiesConfiguration(propFile)
+    val depositProperties = new PropertiesConfiguration(deposit.resolve("deposit.properties").toFile)
     if (!isSubmitted(depositProperties) || isCurated(depositProperties)) {
       var msg = ""
       if (!isSubmitted(depositProperties))
@@ -160,9 +158,8 @@ class EasyManageCurationWorkApp(configuration: Configuration) extends DebugEnhan
       msg
     }
     else {
-      setDatamanagerProperty(propFile, depositProperties, datamanager)
+      clearProperties(depositProperties)
       FileUtils.moveDirectory(deposit.toFile, commonCurationDir.resolve(deposit.getFileName).toFile)
-//      Files.move(deposit, commonCurationDir.resolve(deposit.getFileName))
       s"\nDeposit $deposit has been unassigned from datamanager $datamanager."
     }
   }
@@ -175,12 +172,17 @@ class EasyManageCurationWorkApp(configuration: Configuration) extends DebugEnhan
     depositProperties.getString("curation.performed") == "yes"
   }
 
-  private def setDatamanagerProperty(propFile: File, depositProperties: PropertiesConfiguration, datamanager: DatamanagerId): Unit = {
-//    if (depositProperties.containsKey("curation.datamanager.userId"))
-      depositProperties.setProperty("curation.datamanager.userId", datamanager)
-      depositProperties.setProperty("state.label", "ABC")
-//      Using.fileWriter()(propFile).map(out => depositProperties.store(out, ""))
-//      .map(out => depositProperties.store(out, ""))
+  private def setProperties(depositProperties: PropertiesConfiguration, datamanager: DatamanagerId): Unit = {
+    val datamanagerProperties = cfgDatamanagers.properties.getString(datamanager).split(" ")
+    depositProperties.setProperty("curation.datamanager.userId", datamanagerProperties(0))
+    depositProperties.setProperty("curation.datamanager.email", datamanagerProperties(1))
+    depositProperties.save()
+  }
+
+  private def clearProperties(depositProperties: PropertiesConfiguration): Unit = {
+    depositProperties.clearProperty("curation.datamanager.userId")
+    depositProperties.clearProperty("curation.datamanager.email")
+    depositProperties.save()
   }
 
   @tailrec
