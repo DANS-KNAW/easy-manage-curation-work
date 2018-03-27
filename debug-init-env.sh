@@ -16,12 +16,17 @@
 #
 
 DATADIR=data
+DATAMANAGER_CURATION_AREAS=data/datamanager-curation-areas
 
-echo -n "Pre-creating log..."
+echo "Pre-creating log..."
 touch $DATADIR/easy-manage-curation-work.log
 
-echo "Copy test input into $DATADIR..."
-cp -r src/test/resources/easy-common-curation-area ${DATADIR}/easy-common-curation-area
-cp -r src/test/resources/datamanager-curation-areas ${DATADIR}/datamanager-curation-areas
+echo "Delete test data from $DATAMANAGER_CURATION_AREAS..."
+rm -r ${DATAMANAGER_CURATION_AREAS}
+
+echo "Copy test input into $EASY_COMMON_CURATION_AREA.."
+cp -r src/test/resources/easy-common-curation-area ${DATADIR}
+echo "Copy test input into $DATAMANAGER_CURATION_AREAS.."
+cp -r src/test/resources/datamanager-curation-areas ${DATAMANAGER_CURATION_AREAS}
 
 echo "OK"

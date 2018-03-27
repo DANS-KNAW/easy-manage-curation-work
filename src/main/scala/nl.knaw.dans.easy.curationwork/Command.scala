@@ -43,13 +43,13 @@ object Command extends App with DebugEnhancedLogging {
       .collect {
         case cmd @ commandLine.list =>
           if (validDatamanager(cmd.datamanager.toOption)) app.listCurationWork(cmd.datamanager.toOption)
-          else Try(s"Error: Unknown datamanager ${cmd.datamanager.apply()}")
+          else Try(s"Error: Unknown datamanager ${cmd.datamanager()}")
         case cmd @ commandLine.assign =>
           if (validDatamanager(cmd.datamanager.toOption)) app.assignCurationWork(cmd.datamanager.toOption, cmd.uuid.toOption)
-          else Try(s"Error: Unknown datamanager ${cmd.datamanager.apply()}")
+          else Try(s"Error: Unknown datamanager ${cmd.datamanager()}")
         case cmd @ commandLine.unassign =>
           if (validDatamanager(cmd.datamanager.toOption)) app.unassignCurationWork(cmd.datamanager.toOption, cmd.uuid.toOption)
-          else Try(s"Error: Unknown datamanager ${cmd.datamanager.apply()}")
+          else Try(s"Error: Unknown datamanager ${cmd.datamanager()}")
       }
       .getOrElse(Failure(new IllegalArgumentException(s"Unknown command: ${ commandLine.subcommand }")))
   }
