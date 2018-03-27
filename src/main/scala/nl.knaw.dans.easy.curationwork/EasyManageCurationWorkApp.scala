@@ -32,7 +32,7 @@ import scala.util.Try
 import scala.xml.XML
 
 
-class EasyManageCurationWorkApp(configuration: Configuration, cfgDatamanagers: Configuration) extends DebugEnhancedLogging {
+class EasyManageCurationWorkApp(configuration: Configuration) extends DebugEnhancedLogging {
 
   private val commonCurationDir = Paths.get(configuration.properties.getString("curation.common.directory"))
   private val managerCurationDirString = configuration.properties.getString("curation.personal.directory")
@@ -67,7 +67,7 @@ class EasyManageCurationWorkApp(configuration: Configuration, cfgDatamanagers: C
   }
 
   private def setProperties(depositProperties: PropertiesConfiguration, datamanager: DatamanagerId): Unit = {
-    val datamanagerProperties = cfgDatamanagers.properties.getString(datamanager).split(" ")
+    val datamanagerProperties = configuration.datamanagers.getString(datamanager).split(" ")
     depositProperties.setProperty("curation.datamanager.userId", datamanagerProperties(0))
     depositProperties.setProperty("curation.datamanager.email", datamanagerProperties(1))
     depositProperties.save()

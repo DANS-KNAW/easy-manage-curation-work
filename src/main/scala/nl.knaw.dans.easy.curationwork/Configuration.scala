@@ -22,11 +22,11 @@ import resource.managed
 
 import scala.io.Source
 
-case class Configuration(version: String, properties: PropertiesConfiguration)
+case class Configuration(version: String, properties: PropertiesConfiguration, datamanagers: PropertiesConfiguration)
 
 object Configuration {
 
-  def apply(home: Path, name: String): Configuration = {
+  def apply(home: Path): Configuration = {
     val cfgPath = Seq(
       Paths.get(s"/etc/opt/dans.knaw.nl/easy-manage-curation-work/"),
       home.resolve("cfg"))
@@ -37,7 +37,11 @@ object Configuration {
       version = managed(Source.fromFile(home.resolve("bin/version").toFile)).acquireAndGet(_.mkString),
       properties = new PropertiesConfiguration() {
         setDelimiterParsingDisabled(true)
-        load(cfgPath.resolve(name).toFile)
+        load(cfgPath.resolve("application.properties").toFile)
+      },
+      datamanagers = new PropertiesConfiguration() {
+        setDelimiterParsingDisabled(true)
+        load(cfgPath.resolve("datamanager.properties").toFile)
       }
     )
   }

@@ -27,12 +27,11 @@ import scala.util.{ Failure, Success, Try }
 object Command extends App with DebugEnhancedLogging {
   type FeedBackMessage = String
 
-  val configuration = Configuration(Paths.get(System.getProperty("app.home")), "application.properties")
-  val cfgDatamanagers = Configuration(Paths.get(System.getProperty("app.home")), "datamanager.properties")
+  val configuration = Configuration(Paths.get(System.getProperty("app.home")))
   val commandLine: CommandLineOptions = new CommandLineOptions(args, configuration) {
     verify()
   }
-  val app = new EasyManageCurationWorkApp(configuration, cfgDatamanagers)
+  val app = new EasyManageCurationWorkApp(configuration)
 
   runSubcommand(app)
     .doIfSuccess(msg => println(s"$msg"))
@@ -56,6 +55,6 @@ object Command extends App with DebugEnhancedLogging {
   }
 
   private def validDatamanager(datamanager: Option[DatamanagerId]): Boolean = {
-    datamanager.isEmpty || cfgDatamanagers.properties.containsKey(datamanager.getOrElse(""))
+    datamanager.isEmpty || configuration.datamanagers.containsKey(datamanager.getOrElse(""))
   }
 }
