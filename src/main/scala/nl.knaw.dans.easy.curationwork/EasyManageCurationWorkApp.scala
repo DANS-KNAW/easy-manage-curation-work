@@ -45,8 +45,8 @@ class EasyManageCurationWorkApp(configuration: Configuration) extends DebugEnhan
     Paths.get(managerCurationDirString.replace("$unix-user", datamanager))
   }
 
-  private def getCurrentUnixUser: Option[DatamanagerId] = {
-    Option("whoami" !!)
+  private def getCurrentUnixUser: String = {
+    "whoami" !!
   }
 
   private def directoryExists(dir: Path, uuid: Option[BagId] = None): Boolean = {
@@ -79,8 +79,8 @@ class EasyManageCurationWorkApp(configuration: Configuration) extends DebugEnhan
   }
 
   @tailrec
-  private def confirmAction(datamanager: Option[DatamanagerId]): Boolean = {
-    StdIn.readLine(s"This action will move all deposits from the curation area of datamanager ${datamanager.getOrElse("")} to the common curation area. OK? (y/n):") match {
+  private def confirmAction(datamanager: DatamanagerId): Boolean = {
+    StdIn.readLine(s"This action will move all deposits from the curation area of datamanager $datamanager to the common curation area. OK? (y/n):") match {
       case "y" => true
       case "n" => false
       case _ =>
@@ -106,9 +106,9 @@ class EasyManageCurationWorkApp(configuration: Configuration) extends DebugEnhan
 
           val xml = XML.loadFile(bagDir.resolve("metadata/dataset.xml").toFile)
           val titles = xml \\ "title"
-          val title = titles.headOption.getOrElse("n/a").toString
+          val title = titles.headOption.map(_.text).getOrElse("n/a").toString
           val audiences = xml \\ "audience"
-          val audience = audiences.headOption.getOrElse("n/a").toString
+          val audience = audiences.headOption.map(_.text).getOrElse("n/a").toString
 
 
           Deposit(
@@ -152,8 +152,8 @@ class EasyManageCurationWorkApp(configuration: Configuration) extends DebugEnhan
     }
   }
 
-  private def unassign(datamanager: Option[DatamanagerId], uuid: Option[BagId]): String = {
-    val curationDirectory = getCurationDirectory(datamanager)
+  private def unassign(datamanager: DatamanagerId, uuid: Option[BagId]): String = {
+    val curationDirectory = getCurationDirectory(Some(datamanager))
     if (directoryExists(curationDirectory, uuid)) {
       if (uuid.isEmpty && !confirmAction(datamanager))
         s"\nAction cancelled"
@@ -162,19 +162,21 @@ class EasyManageCurationWorkApp(configuration: Configuration) extends DebugEnhan
     }
     else
       uuid match {
-        case Some(_) => s"\nError: Deposit ${_} not found in the curation area of datamanager ${datamanager.getOrElse("???")}."
-        case None => s"\nError: No personal curation area found for datamanager ${datamanager.getOrElse("???")}."
+        case Some(deposit) => s"\nError: Deposit $deposit not found in the curation area of datamanager $datamanager."
+        case None => s"\nError: No personal curation area found for datamanager $datamanager."
       }
   }
 
-  private def unassignFromDatamanager(personalCurationDirectory: Path, uuid: Option[BagId], datamanager: Option[DatamanagerId]): String = {
+  private def unassignFromDatamanager(personalCurationDirectory: Path, uuid: Option[BagId], datamanager: DatamanagerId): String = {
     uuid match {
-      case Some(deposit) => unassignDeposit(personalCurationDirectory.resolve(deposit), datamanager.getOrElse(""))
-      case None => var msg = "";
-        Files.list(personalCurationDirectory).filter(Files.isDirectory(_)).
-          forEach(deposit => msg += unassignDeposit(deposit, datamanager.getOrElse("")))
-        if (msg.isEmpty) msg = s"There were no deposits to unassign."
-        msg
+      case Some(deposit) => unassignDeposit(personalCurationDirectory.resolve(deposit), datamanager)
+      case None =>
+        val msg = managed(Files.list(personalCurationDirectory)).acquireAndGet(jStream => jStream.iterator().asScala.toList)
+          .filter(Files.isDirectory(_))
+          .foldLeft("")((msg, deposit) => msg + unassignDeposit(deposit, datamanager))
+
+        if (msg.isEmpty) "There were no deposits to unassign."
+        else msg
     }
   }
 
@@ -204,19 +206,19 @@ class EasyManageCurationWorkApp(configuration: Configuration) extends DebugEnhan
     else s"\nError: No personal curation area found for datamanager ${datamanager.getOrElse("")}."
   }
 
-  def assignCurationWork(datamanager: Option[DatamanagerId] = None, uuid: Option[BagId] = None): Try[String] = Try {
-    val curationDirectory = getCurationDirectory(datamanager)
-    if (directoryExists(commonCurationDir, uuid)) {
+  def assignCurationWork(datamanager: DatamanagerId, uuid: BagId): Try[String] = Try {
+    val curationDirectory = getCurationDirectory(Some(datamanager))
+    if (directoryExists(commonCurationDir, Some(uuid))) {
       if (directoryExists(curationDirectory))
-        assignToDatamanager(datamanager.getOrElse(""), curationDirectory, uuid.getOrElse(""))
-      else s"\nError: No personal curation area found for datamanager ${datamanager.getOrElse("")}."
+        assignToDatamanager(datamanager, curationDirectory, uuid)
+      else s"\nError: No personal curation area found for datamanager $datamanager."
     }
-    else s"\nError: Deposit ${uuid.getOrElse("")} not found in the common curation area."
+    else s"\nError: Deposit $uuid not found in the common curation area."
   }
 
   def unassignCurationWork(datamanager: Option[DatamanagerId] = None, uuid: Option[BagId] = None): Try[String] = Try {
     datamanager match {
-      case Some(_) => unassign(datamanager, uuid)
+      case Some(dm) => unassign(dm, uuid)
       case None => unassign(getCurrentUnixUser, uuid)
     }
   }

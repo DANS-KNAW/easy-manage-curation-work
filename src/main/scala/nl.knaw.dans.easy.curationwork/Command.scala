@@ -45,7 +45,7 @@ object Command extends App with DebugEnhancedLogging {
           if (validDatamanager(cmd.datamanager.toOption)) app.listCurationWork(cmd.datamanager.toOption)
           else Try(s"Error: Unknown datamanager ${cmd.datamanager()}")
         case cmd @ commandLine.assign =>
-          if (validDatamanager(cmd.datamanager.toOption)) app.assignCurationWork(cmd.datamanager.toOption, cmd.uuid.toOption)
+          if (validDatamanager(cmd.datamanager.toOption)) app.assignCurationWork(cmd.datamanager(), cmd.uuid())
           else Try(s"Error: Unknown datamanager ${cmd.datamanager()}")
         case cmd @ commandLine.unassign =>
           if (validDatamanager(cmd.datamanager.toOption)) app.unassignCurationWork(cmd.datamanager.toOption, cmd.uuid.toOption)
