@@ -45,23 +45,23 @@ class CommandLineOptions(args: Array[String], configuration: Configuration) exte
   //val url = opt[String]("someOption", noshort = true, descr = "Description of the option", default = app.someProperty)
 
   val list = new Subcommand("list") {
-    val datamanager: ScallopOption[DatamanagerId] = trailArg("easy-datamanager", required = false)
+    val datamanager: ScallopOption[DatamanagerId] = trailArg("easy-datamanager", descr = "Datamanager, whose to-be-curated deposits are listed. If not specified, deposits from the common curation area are listed.", required = false)
     descr("Lists the current curation tasks.")
     footer(SUBCOMMAND_SEPARATOR)
   }
   addSubcommand(list)
 
   val assign = new Subcommand("assign") {
-    val datamanager: ScallopOption[DatamanagerId] = trailArg("easy-datamanager", required = true)
-    val uuid: ScallopOption[DatamanagerId] = trailArg("uuid", required = true)
+    val datamanager: ScallopOption[DatamanagerId] = trailArg("easy-datamanager", descr = "Datamanager, to whom the deposit will be assigned.")
+    val uuid: ScallopOption[DatamanagerId] = trailArg("uuid", descr = "UUID of the deposit to be assigned.")
     descr("Assigns curation task to a datamanager.")
     footer(SUBCOMMAND_SEPARATOR)
   }
   addSubcommand(assign)
 
   val unassign = new Subcommand("unassign") {
-    val datamanager: ScallopOption[DatamanagerId] = trailArg("easy-datamanager", required = false)
-    val uuid: ScallopOption[DatamanagerId] = trailArg("uuid", required = false)
+    val datamanager: ScallopOption[DatamanagerId] = trailArg("easy-datamanager", descr = "Datamanager, from whom the deposit will be unassigned. If not specified, datamanager is the current user.", required = false)
+    val uuid: ScallopOption[DatamanagerId] = trailArg("uuid", descr = "UUID of the deposit to be unassigned. If not specified, all deposits of the datamanager are unassigned.", required = false)
     descr("Unassigns curation tasks.")
     footer(SUBCOMMAND_SEPARATOR)
   }
