@@ -15,6 +15,8 @@
  */
 package nl.knaw.dans.easy
 
+import java.nio.file.Paths
+
 package object curationwork {
 
   type Deposits = Seq[Deposit]
@@ -22,4 +24,7 @@ package object curationwork {
   type DepositorId = String
   type DatamanagerId = String
 
+  val configuration = Configuration(Paths.get(System.getProperty("app.home")))
+  val commonCurationDir = Paths.get(configuration.properties.getString("curation.common.directory"))
+  val managerCurationDirString = configuration.properties.getString("curation.personal.directory")
 }

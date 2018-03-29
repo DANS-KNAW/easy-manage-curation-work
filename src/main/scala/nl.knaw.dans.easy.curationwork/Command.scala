@@ -27,28 +27,29 @@ import scala.util.{ Failure, Success, Try }
 object Command extends App with DebugEnhancedLogging {
   type FeedBackMessage = String
 
-  val configuration = Configuration(Paths.get(System.getProperty("app.home")))
   val commandLine: CommandLineOptions = new CommandLineOptions(args, configuration) {
     verify()
   }
-  val app = new EasyManageCurationWorkApp(configuration)
+  val reporter = new Report(configuration)
+  val assigner = new Assign(configuration)
+  val unassigner = new Unassign(configuration)
 
-  runSubcommand(app)
+  runSubcommand(reporter, assigner, unassigner)
     .doIfSuccess(msg => println(s"$msg"))
     .doIfFailure { case e => logger.error(e.getMessage, e) }
     .doIfFailure { case NonFatal(e) => println(s"FAILED: ${ e.getMessage }") }
 
-  private def runSubcommand(app: EasyManageCurationWorkApp): Try[FeedBackMessage] = {
+  private def runSubcommand(reporter: Report, assigner: Assign, unassigner: Unassign): Try[FeedBackMessage] = {
     commandLine.subcommand
       .collect {
         case cmd @ commandLine.list =>
-          if (validDatamanager(cmd.datamanager.toOption)) app.listCurationWork(cmd.datamanager.toOption)
+          if (validDatamanager(cmd.datamanager.toOption)) reporter.listCurationWork(cmd.datamanager.toOption)
           else Try(s"Error: Unknown datamanager ${cmd.datamanager()}")
         case cmd @ commandLine.assign =>
-          if (validDatamanager(cmd.datamanager.toOption)) app.assignCurationWork(cmd.datamanager(), cmd.uuid())
+          if (validDatamanager(cmd.datamanager.toOption)) assigner.assignCurationWork(cmd.datamanager(), cmd.uuid())
           else Try(s"Error: Unknown datamanager ${cmd.datamanager()}")
         case cmd @ commandLine.unassign =>
-          if (validDatamanager(cmd.datamanager.toOption)) app.unassignCurationWork(cmd.datamanager.toOption, cmd.uuid.toOption)
+          if (validDatamanager(cmd.datamanager.toOption)) unassigner.unassignCurationWork(cmd.datamanager.toOption, cmd.uuid.toOption)
           else Try(s"Error: Unknown datamanager ${cmd.datamanager()}")
       }
       .getOrElse(Failure(new IllegalArgumentException(s"Unknown command: ${ commandLine.subcommand }")))
