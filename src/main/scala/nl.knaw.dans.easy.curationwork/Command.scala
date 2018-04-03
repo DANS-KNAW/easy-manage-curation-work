@@ -27,6 +27,7 @@ import scala.util.{ Failure, Success, Try }
 object Command extends App with DebugEnhancedLogging {
   type FeedBackMessage = String
 
+  val configuration = Configuration(Paths.get(System.getProperty("app.home")))
   val commandLine: CommandLineOptions = new CommandLineOptions(args, configuration) {
     verify()
   }

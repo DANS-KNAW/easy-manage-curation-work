@@ -23,8 +23,4 @@ package object curationwork {
   type BagId = String
   type DepositorId = String
   type DatamanagerId = String
-
-  val configuration = Configuration(Paths.get(System.getProperty("app.home")))
-  val commonCurationDir = Paths.get(configuration.properties.getString("curation.common.directory"))
-  val managerCurationDirString = configuration.properties.getString("curation.personal.directory")
 }

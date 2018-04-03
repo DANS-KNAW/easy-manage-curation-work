@@ -15,38 +15,26 @@
  */
 package nl.knaw.dans.easy.curationwork
 
-import java.nio.file.{Files, Path, Paths}
+import java.nio.file.{Files, Path}
 
-import sys.process._
 import org.apache.commons.configuration.PropertiesConfiguration
 import nl.knaw.dans.lib.logging.DebugEnhancedLogging
 import resource.managed
 import org.apache.commons.csv.CSVFormat
-import org.apache.commons.io.FileUtils
 
-import scala.annotation.tailrec
 import scala.collection.JavaConverters._
-import scala.io.StdIn
 import scala.language.postfixOps
 import scala.util.Try
 import scala.xml.XML
 
 
-class Report(configuration: Configuration) extends DebugEnhancedLogging {
+class Report(configuration: Configuration) extends EasyManageCurationWorkApp(configuration) with DebugEnhancedLogging {
 
-  private def getCurationDirectory(datamanager: Option[DatamanagerId]): Path = {
-    datamanager.map(getManagerCurationDir).getOrElse(commonCurationDir)
-  }
-
-  private def getManagerCurationDir(datamanager: DatamanagerId): Path = {
-    Paths.get(managerCurationDirString.replace("$unix-user", datamanager))
-  }
-
-  private def listCurationArea(path: Path): List[Path] = {
+  def listCurationArea(path: Path): List[Path] = {
     managed(Files.list(path)).acquireAndGet(stream => stream.iterator().asScala.toList)
   }
 
-  private def depositsFromCurationArea(deposits: List[Path]): Deposits = {
+  def depositsFromCurationArea(deposits: List[Path]): Deposits = {
     deposits.filter(Files.isDirectory(_))
       .flatMap { depositDirPath =>
         //        debug(s"Getting info from $depositDirPath")

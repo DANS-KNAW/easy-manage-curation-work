@@ -15,36 +15,16 @@
  */
 package nl.knaw.dans.easy.curationwork
 
-import java.nio.file.{Files, Path, Paths}
+import java.nio.file.Path
 
 import nl.knaw.dans.lib.logging.DebugEnhancedLogging
 import org.apache.commons.configuration.PropertiesConfiguration
-import org.apache.commons.csv.CSVFormat
 import org.apache.commons.io.FileUtils
-import resource.managed
 
-import scala.annotation.tailrec
-import scala.collection.JavaConverters._
-import scala.io.StdIn
 import scala.language.postfixOps
-import scala.sys.process._
 import scala.util.Try
-import scala.xml.XML
 
-
-class Assign(configuration: Configuration) extends DebugEnhancedLogging {
-
-  private def getCurationDirectory(datamanager: Option[DatamanagerId]): Path = {
-    datamanager.map(getManagerCurationDir).getOrElse(commonCurationDir)
-  }
-
-  private def getManagerCurationDir(datamanager: DatamanagerId): Path = {
-    Paths.get(managerCurationDirString.replace("$unix-user", datamanager))
-  }
-
-  private def directoryExists(dir: Path, uuid: Option[BagId] = None): Boolean = {
-    Files.exists(dir.resolve(uuid.getOrElse("")))
-  }
+class Assign(configuration: Configuration) extends EasyManageCurationWorkApp(configuration) with DebugEnhancedLogging  {
 
   private def setProperties(depositProperties: PropertiesConfiguration, datamanager: DatamanagerId): Unit = {
     val datamanagerProperties = configuration.datamanagers.getString(datamanager).split(" ")

@@ -15,11 +15,10 @@
  */
 package nl.knaw.dans.easy.curationwork
 
-import java.nio.file.{Files, Path, Paths}
+import java.nio.file.{Files, Path}
 
 import nl.knaw.dans.lib.logging.DebugEnhancedLogging
 import org.apache.commons.configuration.PropertiesConfiguration
-import org.apache.commons.csv.CSVFormat
 import org.apache.commons.io.FileUtils
 import resource.managed
 
@@ -29,25 +28,11 @@ import scala.io.StdIn
 import scala.language.postfixOps
 import scala.sys.process._
 import scala.util.Try
-import scala.xml.XML
 
-
-class Unassign(configuration: Configuration) extends DebugEnhancedLogging {
-
-  private def getCurationDirectory(datamanager: Option[DatamanagerId]): Path = {
-    datamanager.map(getManagerCurationDir).getOrElse(commonCurationDir)
-  }
-
-  private def getManagerCurationDir(datamanager: DatamanagerId): Path = {
-    Paths.get(managerCurationDirString.replace("$unix-user", datamanager))
-  }
+class Unassign(configuration: Configuration) extends EasyManageCurationWorkApp(configuration) with DebugEnhancedLogging {
 
   private def getCurrentUnixUser: String = {
     "whoami" !!
-  }
-
-  private def directoryExists(dir: Path, uuid: Option[BagId] = None): Boolean = {
-    Files.exists(dir.resolve(uuid.getOrElse("")))
   }
 
   private def isSubmitted(depositProperties: PropertiesConfiguration): Boolean = {
@@ -74,7 +59,6 @@ class Unassign(configuration: Configuration) extends DebugEnhancedLogging {
         confirmAction(datamanager)
     }
   }
-
 
   private def unassignDeposit(deposit: Path, datamanager: DatamanagerId): String = {
     val depositProperties = new PropertiesConfiguration(deposit.resolve("deposit.properties").toFile)
