@@ -16,21 +16,16 @@
 package nl.knaw.dans.easy.curationwork
 
 import java.nio.file.{ Files, Path, Paths }
-import nl.knaw.dans.lib.logging.DebugEnhancedLogging
-import scala.language.postfixOps
 
+import org.apache.commons.io.FileUtils
+import org.scalatest.{ BeforeAndAfterEach, FlatSpec, Inside, Matchers }
 
-class EasyManageCurationWorkApp(val commonCurationDir: Path, val managerCurationDirString: String) extends DebugEnhancedLogging {
+trait TestSupportFixture extends FlatSpec with Matchers with Inside with BeforeAndAfterEach {
 
-  def getCurationDirectory(datamanager: Option[DatamanagerId]): Path = {
-    datamanager.map(getManagerCurationDir).getOrElse(commonCurationDir)
-  }
-
-  private def getManagerCurationDir(datamanager: DatamanagerId): Path = {
-    Paths.get(managerCurationDirString.replace("$unix-user", datamanager))
-  }
-
-  def directoryExists(dir: Path, uuid: Option[BagId] = None): Boolean = {
-    Files.exists(dir.resolve(uuid.getOrElse("")))
+  lazy val testDir: Path = {
+    val path = Paths.get(s"target/test/${ getClass.getSimpleName }").toAbsolutePath
+    FileUtils.deleteQuietly(path.toFile)
+    Files.createDirectories(path)
+    path
   }
 }

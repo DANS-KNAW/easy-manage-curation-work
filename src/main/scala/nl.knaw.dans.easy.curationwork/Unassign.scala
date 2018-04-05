@@ -29,7 +29,7 @@ import scala.language.postfixOps
 import scala.sys.process._
 import scala.util.Try
 
-class Unassign(configuration: Configuration) extends EasyManageCurationWorkApp(configuration) with DebugEnhancedLogging {
+class Unassign(commonCurationDir: Path, managerCurationDirString: String) extends EasyManageCurationWorkApp(commonCurationDir, managerCurationDirString) with DebugEnhancedLogging {
 
   private def getCurrentUnixUser: String = {
     "whoami" !!

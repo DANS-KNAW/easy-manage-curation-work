@@ -24,12 +24,12 @@ import org.apache.commons.io.FileUtils
 import scala.language.postfixOps
 import scala.util.Try
 
-class Assign(configuration: Configuration) extends EasyManageCurationWorkApp(configuration) with DebugEnhancedLogging  {
+class Assign(commonCurationDir: Path, managerCurationDirString: String, datamanagerProperties: PropertiesConfiguration) extends EasyManageCurationWorkApp(commonCurationDir, managerCurationDirString) with DebugEnhancedLogging  {
 
-  private def setProperties(depositProperties: PropertiesConfiguration, datamanager: DatamanagerId): Unit = {
-    val datamanagerProperties = configuration.datamanagers.getString(datamanager).split(" ")
-    depositProperties.setProperty("curation.datamanager.userId", datamanagerProperties(0))
-    depositProperties.setProperty("curation.datamanager.email", datamanagerProperties(1))
+  private def setProperties(depositProperties: PropertiesConfiguration, datamanager: String): Unit = {
+    val dmProp = datamanagerProperties.getString(datamanager).split(" ")
+    depositProperties.setProperty("curation.datamanager.userId", dmProp(0))
+    depositProperties.setProperty("curation.datamanager.email", dmProp(1))
     depositProperties.save()
   }
 

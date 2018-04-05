@@ -28,7 +28,7 @@ import scala.util.Try
 import scala.xml.XML
 
 
-class Report(configuration: Configuration) extends EasyManageCurationWorkApp(configuration) with DebugEnhancedLogging {
+class Report(commonCurationDir: Path, managerCurationDirString: String) extends EasyManageCurationWorkApp(commonCurationDir, managerCurationDirString) with DebugEnhancedLogging {
 
   def listCurationArea(path: Path): List[Path] = {
     managed(Files.list(path)).acquireAndGet(stream => stream.iterator().asScala.toList)
@@ -70,7 +70,7 @@ class Report(configuration: Configuration) extends EasyManageCurationWorkApp(con
       }
   }
 
-  private def outputCurationList(deposits: Deposits): Unit = {
+  def outputCurationList(deposits: Deposits): Unit = {
     val csvFormat: CSVFormat = CSVFormat.RFC4180
       .withHeader("UUID", "TITLE", "DEPOSITOR", "DEPOSIT_CREATION_TIMESTAMP", "AUDIENCE")
       .withDelimiter(',')

@@ -22,7 +22,7 @@ import nl.knaw.dans.lib.logging.DebugEnhancedLogging
 
 import scala.language.reflectiveCalls
 import scala.util.control.NonFatal
-import scala.util.{ Failure, Success, Try }
+import scala.util.{ Failure, Try }
 
 object Command extends App with DebugEnhancedLogging {
   type FeedBackMessage = String
@@ -31,9 +31,13 @@ object Command extends App with DebugEnhancedLogging {
   val commandLine: CommandLineOptions = new CommandLineOptions(args, configuration) {
     verify()
   }
-  val reporter = new Report(configuration)
-  val assigner = new Assign(configuration)
-  val unassigner = new Unassign(configuration)
+  val commonCurationArea = Paths.get(configuration.properties.getString("curation.common.directory"))
+  val managerCurationDirString = configuration.properties.getString("curation.personal.directory")
+  val datamanagerProperties = Configuration(Paths.get(System.getProperty("app.home"))).datamanagers
+
+  val reporter = new Report(commonCurationArea, managerCurationDirString)
+  val assigner = new Assign(commonCurationArea, managerCurationDirString, datamanagerProperties)
+  val unassigner = new Unassign(commonCurationArea, managerCurationDirString)
 
   runSubcommand(reporter, assigner, unassigner)
     .doIfSuccess(msg => println(s"$msg"))
