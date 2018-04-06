@@ -42,7 +42,7 @@ class AssignSpec extends TestSupportFixture {
 
   override def beforeEach(): Unit = {
     FileUtils.copyDirectory(Paths.get(getClass.getResource("/easy-common-curation-area").toURI).toFile, commonCurationArea.toFile)
-    try {FileUtils.forceDelete(jannekesCurationArea.toFile)} catch { case e: FileNotFoundException => }
+    FileUtils.deleteQuietly(jannekesCurationArea.toFile)
     Files.createDirectories(jannekesCurationArea)
     commonCurationArea.toFile should exist
     jannekesCurationArea.toFile should exist
@@ -69,7 +69,7 @@ class AssignSpec extends TestSupportFixture {
     assigner.assignCurationWork(janneke, "non-existing-uuid").getOrElse("") should include(s"Deposit non-existing-uuid not found in the common curation area")
   }
 
-  "assigning a uuid that already exists in the personal curationa area of a datamanager" should "fail" in {
+  "assigning a uuid that already exists in the personal curation area of a datamanager" should "fail" in {
     FileUtils.copyDirectory(commonCurationArea.resolve(uuid).toFile, jannekesCurationArea.resolve(uuid).toFile)
     assigner.assignCurationWork(janneke, uuid).getOrElse("") should include(s"Deposit $uuid already exists in the personal curation area of datamanager $janneke")
   }

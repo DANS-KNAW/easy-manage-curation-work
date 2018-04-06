@@ -15,13 +15,6 @@
  */
 package nl.knaw.dans.easy.curationwork
 
-import java.io.FileNotFoundException
-import java.nio.file.{ Files, Paths }
-
-import org.apache.commons.io.FileUtils
-
-import scala.util.Success
-
 class CurationWorkSpec extends TestSupportFixture {
 
   val commonCurationArea = testDir.resolve("easy-common-curation-area")

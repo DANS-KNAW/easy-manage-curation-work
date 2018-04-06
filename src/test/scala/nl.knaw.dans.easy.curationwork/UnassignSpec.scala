@@ -45,7 +45,7 @@ class UnassignSpec extends TestSupportFixture {
 
   override def beforeEach(): Unit = {
     FileUtils.copyDirectory(Paths.get(getClass.getResource("/easy-common-curation-area").toURI).toFile, commonCurationArea.toFile)
-    try {FileUtils.forceDelete(jannekesCurationArea.toFile)} catch { case e: FileNotFoundException => }
+    FileUtils.deleteQuietly(jannekesCurationArea.toFile)
     Files.createDirectories(jannekesCurationArea)
     commonCurationArea.toFile should exist
     jannekesCurationArea.toFile should exist
