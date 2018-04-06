@@ -15,7 +15,6 @@
  */
 package nl.knaw.dans.easy.curationwork
 
-import java.io.FileNotFoundException
 import java.nio.file.{ Files, Paths }
 
 import org.apache.commons.configuration.PropertiesConfiguration
@@ -25,8 +24,13 @@ import scala.util.Success
 
 class AssignSpec extends TestSupportFixture {
 
-  val configuration = Configuration(Paths.get("home"))
-  val datamanagerProperties = configuration.datamanagers
+  val resourceDirString: String = Paths.get(getClass.getResource("/").toURI).toAbsolutePath.toString
+  val datamanagerProperties = new Configuration("version x.y.z",
+    new PropertiesConfiguration() {},
+    new PropertiesConfiguration() {
+      setDelimiterParsingDisabled(true)
+      load(Paths.get(resourceDirString + "/debug-config", "datamanager.properties").toFile)
+    }).datamanagers
 
   val commonCurationArea = testDir.resolve("easy-common-curation-area")
   val datamanagerCurationAreas = testDir.resolve("datamanager-curation-areas")

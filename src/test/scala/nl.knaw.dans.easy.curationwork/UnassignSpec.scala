@@ -15,7 +15,6 @@
  */
 package nl.knaw.dans.easy.curationwork
 
-import java.io.FileNotFoundException
 import java.nio.file.{ Files, Paths }
 
 import org.apache.commons.configuration.PropertiesConfiguration
@@ -25,8 +24,13 @@ import scala.util.Success
 
 class UnassignSpec extends TestSupportFixture {
 
-  val configuration = Configuration(Paths.get("home"))
-  val datamanagerProperties = configuration.datamanagers
+  val resourceDirString: String = Paths.get(getClass.getResource("/").toURI).toAbsolutePath.toString
+  val datamanagerProperties = new Configuration("version x.y.z",
+    new PropertiesConfiguration() {},
+    new PropertiesConfiguration() {
+      setDelimiterParsingDisabled(true)
+      load(Paths.get(resourceDirString + "/debug-config", "datamanager.properties").toFile)
+    }).datamanagers
 
   val commonCurationArea = testDir.resolve("easy-common-curation-area")
   val datamanagerCurationAreas = testDir.resolve("datamanager-curation-areas")
@@ -35,13 +39,10 @@ class UnassignSpec extends TestSupportFixture {
 
   val assigner = new Assign(commonCurationArea, managerCurationDirString, datamanagerProperties)
   val unassigner = new Unassign(commonCurationArea, managerCurationDirString)
-  val reporter = new Report(commonCurationArea, managerCurationDirString)
 
   val janneke ="janneke"
   val jip ="jip"
   val uuid = "38bc40f9-12d7-42c6-808a-8eac77bfc726"
-  val uuid2 = "48bc40f9-12d7-42c6-808a-8eac77bfc726"
-
 
   override def beforeEach(): Unit = {
     FileUtils.copyDirectory(Paths.get(getClass.getResource("/easy-common-curation-area").toURI).toFile, commonCurationArea.toFile)

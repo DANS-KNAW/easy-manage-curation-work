@@ -15,12 +15,13 @@
  */
 package nl.knaw.dans.easy
 
-import java.nio.file.Paths
-
 package object curationwork {
 
   type Deposits = Seq[Deposit]
   type Uuid = String
   type DepositorId = String
   type DatamanagerId = String
+
+  val EASY_USER_ID_SUFFIX = ".easyUserId"
+  val EMAIL_SUFFIX = ".email"
 }

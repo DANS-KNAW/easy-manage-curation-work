@@ -27,7 +27,8 @@ import scala.util.Try
 class Assign(commonCurationDir: Path, managerCurationDirString: String, datamanagerProperties: PropertiesConfiguration) extends EasyManageCurationWorkApp(commonCurationDir, managerCurationDirString) with DebugEnhancedLogging  {
 
   private def setProperties(depositProperties: PropertiesConfiguration, datamanager: String): Unit = {
-    val Array(userId, email) = datamanagerProperties.getString(datamanager).split(" ", 2)
+    val userId = datamanagerProperties.getString(datamanager + EASY_USER_ID_SUFFIX)
+    val email = datamanagerProperties.getString(datamanager + EMAIL_SUFFIX)
     depositProperties.setProperty("curation.datamanager.userId", userId)
     depositProperties.setProperty("curation.datamanager.email", email)
     depositProperties.save()

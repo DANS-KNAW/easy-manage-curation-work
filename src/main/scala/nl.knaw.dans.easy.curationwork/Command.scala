@@ -49,18 +49,22 @@ object Command extends App with DebugEnhancedLogging {
       .collect {
         case cmd @ commandLine.list =>
           if (validDatamanager(cmd.datamanager.toOption)) reporter.listCurationWork(cmd.datamanager.toOption)
-          else Try(s"Error: Unknown datamanager ${cmd.datamanager()}")
+          else Try(s"Error: Unknown datamanager ${cmd.datamanager()} (missing in datamanager properties file)")
         case cmd @ commandLine.assign =>
-          if (validDatamanager(cmd.datamanager.toOption)) assigner.assignCurationWork(cmd.datamanager(), cmd.uuid())
-          else Try(s"Error: Unknown datamanager ${cmd.datamanager()}")
+          if (userIdAndEmailExist(cmd.datamanager())) assigner.assignCurationWork(cmd.datamanager(), cmd.uuid())
+          else Try(s"Error: Easy-userid and/or email address of datamanager ${cmd.datamanager()} missing in datamanager properties file")
         case cmd @ commandLine.unassign =>
           if (validDatamanager(cmd.datamanager.toOption)) unassigner.unassignCurationWork(cmd.datamanager.toOption, cmd.uuid.toOption)
-          else Try(s"Error: Unknown datamanager ${cmd.datamanager()}")
+          else Try(s"Unknown datamanager ${cmd.datamanager()} (missing in datamanager properties file)")
       }
       .getOrElse(Failure(new IllegalArgumentException(s"Unknown command: ${ commandLine.subcommand }")))
   }
 
+  private def userIdAndEmailExist(datamanager: DatamanagerId): Boolean = {
+    datamanagerProperties.containsKey(datamanager + EASY_USER_ID_SUFFIX) && datamanagerProperties.containsKey(datamanager + EMAIL_SUFFIX)
+  }
+
   private def validDatamanager(datamanager: Option[DatamanagerId]): Boolean = {
-    datamanager.isEmpty || configuration.datamanagers.containsKey(datamanager.getOrElse(""))
+    datamanager.isEmpty || datamanagerProperties.getKeys(datamanager.getOrElse("") + EASY_USER_ID_SUFFIX).hasNext
   }
 }
