@@ -15,7 +15,7 @@
  */
 package nl.knaw.dans.easy.curationwork
 
-import java.nio.file.Path
+import java.nio.file.{ Files, Path }
 
 import nl.knaw.dans.lib.logging.DebugEnhancedLogging
 import org.apache.commons.configuration.PropertiesConfiguration
@@ -27,14 +27,14 @@ import scala.util.Try
 class Assign(commonCurationDir: Path, managerCurationDirString: String, datamanagerProperties: PropertiesConfiguration) extends EasyManageCurationWorkApp(commonCurationDir, managerCurationDirString) with DebugEnhancedLogging  {
 
   private def setProperties(depositProperties: PropertiesConfiguration, datamanager: String): Unit = {
-    val dmProp = datamanagerProperties.getString(datamanager).split(" ")
-    depositProperties.setProperty("curation.datamanager.userId", dmProp(0))
-    depositProperties.setProperty("curation.datamanager.email", dmProp(1))
+    val Array(userId, email) = datamanagerProperties.getString(datamanager).split(" ", 2)
+    depositProperties.setProperty("curation.datamanager.userId", userId)
+    depositProperties.setProperty("curation.datamanager.email", email)
     depositProperties.save()
   }
 
-  private def assignToDatamanager(datamanager: DatamanagerId, personalCurationDirectory: Path, uuid: BagId): String = {
-    if (directoryExists(personalCurationDirectory.resolve(uuid))) {
+  private def assignToDatamanager(datamanager: DatamanagerId, personalCurationDirectory: Path, uuid: Uuid): String = {
+    if (Files.exists(personalCurationDirectory.resolve(uuid))) {
       s"\nError: Deposit $uuid already exists in the personal curation area of datamanager $datamanager."
     } else {
       val depositProperties = new PropertiesConfiguration(commonCurationDir.resolve(uuid).resolve("deposit.properties").toFile)
@@ -44,10 +44,10 @@ class Assign(commonCurationDir: Path, managerCurationDirString: String, datamana
     }
   }
 
-  def assignCurationWork(datamanager: DatamanagerId, uuid: BagId): Try[String] = Try {
+  def assignCurationWork(datamanager: DatamanagerId, uuid: Uuid): Try[String] = Try {
     val curationDirectory = getCurationDirectory(Some(datamanager))
-    if (directoryExists(commonCurationDir, Some(uuid))) {
-      if (directoryExists(curationDirectory))
+    if (Files.exists(commonCurationDir.resolve(uuid))) {
+      if (Files.exists(curationDirectory))
         assignToDatamanager(datamanager, curationDirectory, uuid)
       else s"\nError: No personal curation area found for datamanager $datamanager."
     }

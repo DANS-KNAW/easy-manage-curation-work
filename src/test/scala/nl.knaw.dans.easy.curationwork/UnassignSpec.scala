@@ -38,7 +38,7 @@ class UnassignSpec extends TestSupportFixture {
   val reporter = new Report(commonCurationArea, managerCurationDirString)
 
   val janneke ="janneke"
-  val mark ="mark"
+  val jip ="jip"
   val uuid = "38bc40f9-12d7-42c6-808a-8eac77bfc726"
   val uuid2 = "48bc40f9-12d7-42c6-808a-8eac77bfc726"
 
@@ -75,7 +75,7 @@ class UnassignSpec extends TestSupportFixture {
   }
 
   "unassigning all deposits from a datamanager who does not yet have a personal curation area" should "fail" in {
-    unassigner.unassignCurationWork(Some(mark), None).getOrElse("") should include(s"No personal curation area found for datamanager $mark")
+    unassigner.unassignCurationWork(Some(jip), None).getOrElse("") should include(s"No personal curation area found for datamanager $jip")
   }
 
   "unassigning a deposit that is not in state 'submitted'" should "fail" in {

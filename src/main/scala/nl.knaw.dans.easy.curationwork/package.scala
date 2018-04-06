@@ -20,7 +20,7 @@ import java.nio.file.Paths
 package object curationwork {
 
   type Deposits = Seq[Deposit]
-  type BagId = String
+  type Uuid = String
   type DepositorId = String
   type DatamanagerId = String
 }

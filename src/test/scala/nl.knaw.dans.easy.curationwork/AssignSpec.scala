@@ -36,7 +36,7 @@ class AssignSpec extends TestSupportFixture {
   val assigner = new Assign(commonCurationArea, managerCurationDirString, datamanagerProperties)
 
   val janneke ="janneke"
-  val mark ="mark"
+  val jip ="jip"
   val uuid = "38bc40f9-12d7-42c6-808a-8eac77bfc726"
 
 
@@ -47,7 +47,6 @@ class AssignSpec extends TestSupportFixture {
     commonCurationArea.toFile should exist
     jannekesCurationArea.toFile should exist
   }
-
 
   "assign to existing datamanager with an existing uuid (in the common curation area)" should "succeed" in {
     assigner.assignCurationWork(janneke, uuid).getOrElse("") should include(s"$uuid has been assigned to datamanager $janneke")
@@ -76,7 +75,7 @@ class AssignSpec extends TestSupportFixture {
   }
 
   "assigning to a datamanager who does not yet have a personal curation area" should "fail" in {
-    assigner.assignCurationWork(mark, uuid).getOrElse("") should include(s"No personal curation area found for datamanager $mark")
+    assigner.assignCurationWork(jip, uuid).getOrElse("") should include(s"No personal curation area found for datamanager $jip")
   }
 
 }

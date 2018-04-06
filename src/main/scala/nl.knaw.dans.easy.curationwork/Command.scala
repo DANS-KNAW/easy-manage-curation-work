@@ -39,12 +39,12 @@ object Command extends App with DebugEnhancedLogging {
   val assigner = new Assign(commonCurationArea, managerCurationDirString, datamanagerProperties)
   val unassigner = new Unassign(commonCurationArea, managerCurationDirString)
 
-  runSubcommand(reporter, assigner, unassigner)
+  runSubcommand()
     .doIfSuccess(msg => println(s"$msg"))
     .doIfFailure { case e => logger.error(e.getMessage, e) }
     .doIfFailure { case NonFatal(e) => println(s"FAILED: ${ e.getMessage }") }
 
-  private def runSubcommand(reporter: Report, assigner: Assign, unassigner: Unassign): Try[FeedBackMessage] = {
+  private def runSubcommand(): Try[FeedBackMessage] = {
     commandLine.subcommand
       .collect {
         case cmd @ commandLine.list =>

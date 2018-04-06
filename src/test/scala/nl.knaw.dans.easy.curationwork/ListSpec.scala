@@ -37,7 +37,7 @@ class ListSpec extends TestSupportFixture {
   val reporter = new Report(commonCurationArea, managerCurationDirString)
 
   val janneke ="janneke"
-  val mark ="mark"
+  val jip ="jip"
   val uuid = "38bc40f9-12d7-42c6-808a-8eac77bfc726"
 
   override def beforeEach(): Unit = {
@@ -63,7 +63,7 @@ class ListSpec extends TestSupportFixture {
   }
 
   "listing deposits of a datamanager who does not yet have personal curation area" should "fail" in {
-    reporter.listCurationWork(Some(mark)).getOrElse("") should include(s"No personal curation area found for datamanager $mark")
+    reporter.listCurationWork(Some(jip)).getOrElse("") should include(s"No personal curation area found for datamanager $jip")
   }
 
   "listing the common curation area" should s"contain details about deposit $uuid" in {

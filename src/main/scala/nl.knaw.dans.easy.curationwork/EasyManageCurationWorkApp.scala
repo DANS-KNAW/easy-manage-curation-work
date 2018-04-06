@@ -15,7 +15,7 @@
  */
 package nl.knaw.dans.easy.curationwork
 
-import java.nio.file.{ Files, Path, Paths }
+import java.nio.file.{ Path, Paths }
 import nl.knaw.dans.lib.logging.DebugEnhancedLogging
 import scala.language.postfixOps
 
@@ -30,7 +30,4 @@ class EasyManageCurationWorkApp(val commonCurationDir: Path, val managerCuration
     Paths.get(managerCurationDirString.replace("$unix-user", datamanager))
   }
 
-  def directoryExists(dir: Path, uuid: Option[BagId] = None): Boolean = {
-    Files.exists(dir.resolve(uuid.getOrElse("")))
-  }
 }

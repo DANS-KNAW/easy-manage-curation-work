@@ -77,7 +77,7 @@ class Unassign(commonCurationDir: Path, managerCurationDirString: String) extend
     }
   }
 
-  private def unassignFromDatamanager(personalCurationDirectory: Path, uuid: Option[BagId], datamanager: DatamanagerId): String = {
+  private def unassignFromDatamanager(personalCurationDirectory: Path, uuid: Option[Uuid], datamanager: DatamanagerId): String = {
     uuid match {
       case Some(deposit) => unassignDeposit(personalCurationDirectory.resolve(deposit), datamanager)
       case None =>
@@ -90,9 +90,9 @@ class Unassign(commonCurationDir: Path, managerCurationDirString: String) extend
     }
   }
 
-  private def unassign(datamanager: DatamanagerId, uuid: Option[BagId]): String = {
+  private def unassign(datamanager: DatamanagerId, uuid: Option[Uuid]): String = {
     val curationDirectory = getCurationDirectory(Some(datamanager))
-    if (directoryExists(curationDirectory, uuid)) {
+    if (Files.exists(curationDirectory.resolve(uuid.getOrElse("")))) {
       if (uuid.isEmpty && !confirmAction(datamanager))
         s"\nAction cancelled"
       else
@@ -105,7 +105,7 @@ class Unassign(commonCurationDir: Path, managerCurationDirString: String) extend
       }
   }
 
-  def unassignCurationWork(datamanager: Option[DatamanagerId] = None, uuid: Option[BagId] = None): Try[String] = Try {
+  def unassignCurationWork(datamanager: Option[DatamanagerId] = None, uuid: Option[Uuid] = None): Try[String] = Try {
     datamanager match {
       case Some(dm) => unassign(dm, uuid)
       case None => unassign(getCurrentUnixUser, uuid)
