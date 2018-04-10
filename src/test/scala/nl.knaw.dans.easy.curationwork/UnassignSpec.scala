@@ -42,7 +42,7 @@ class UnassignSpec extends TestSupportFixture {
 
   val janneke ="janneke"
   val jip ="jip"
-  val uuid = "38bc40f9-12d7-42c6-808a-8eac77bfc726"
+  val bagId = "38bc40f9-12d7-42c6-808a-8eac77bfc726"
 
   override def beforeEach(): Unit = {
     FileUtils.copyDirectory(Paths.get(getClass.getResource("/easy-common-curation-area").toURI).toFile, commonCurationArea.toFile)
@@ -52,27 +52,27 @@ class UnassignSpec extends TestSupportFixture {
     jannekesCurationArea.toFile should exist
   }
 
-  "unassign from an existing datamanager with an existing uuid (in the personal curation area)" should "succeed" in {
-    assigner.assignCurationWork(janneke, uuid) shouldBe a[Success[_]]
-    unassigner.unassignCurationWork(Some(janneke), Some(uuid)).getOrElse("") should include(s"$uuid has been unassigned from datamanager $janneke")
+  "unassign from an existing datamanager with an existing bagId (in the personal curation area)" should "succeed" in {
+    assigner.assignCurationWork(janneke, bagId) shouldBe a[Success[_]]
+    unassigner.unassignCurationWork(Some(janneke), Some(bagId)).getOrElse("") should include(s"$bagId has been unassigned from datamanager $janneke")
   }
 
   "after unassigning a deposit, deposit properties" should "not anymore contain curator properties" in {
-    assigner.assignCurationWork(janneke, uuid) shouldBe a[Success[_]]
-    val depositPropertiesInPersonalCurationArea = new PropertiesConfiguration(jannekesCurationArea.resolve(uuid).resolve("deposit.properties").toFile)
+    assigner.assignCurationWork(janneke, bagId) shouldBe a[Success[_]]
+    val depositPropertiesInPersonalCurationArea = new PropertiesConfiguration(jannekesCurationArea.resolve(bagId).resolve("deposit.properties").toFile)
     depositPropertiesInPersonalCurationArea.getProperty("curation.datamanager.userId").toString should include("user001")
     depositPropertiesInPersonalCurationArea.getProperty("curation.datamanager.email").toString should include("janneke@dans.knaw.nl")
 
-    unassigner.unassignCurationWork(Some(janneke), Some(uuid)) shouldBe a[Success[_]]
-    val depositPropertiesInCommonCurationArea = new PropertiesConfiguration(commonCurationArea.resolve(uuid).resolve("deposit.properties").toFile)
+    unassigner.unassignCurationWork(Some(janneke), Some(bagId)) shouldBe a[Success[_]]
+    val depositPropertiesInCommonCurationArea = new PropertiesConfiguration(commonCurationArea.resolve(bagId).resolve("deposit.properties").toFile)
     depositPropertiesInCommonCurationArea.getProperty("curation.datamanager.userId") shouldBe null
     depositPropertiesInCommonCurationArea.getProperty("curation.datamanager.email") shouldBe null
   }
 
-  "unassigning a uuid that does not (anymore) exist in the personal curation area of a datamanager" should "fail" in {
-    assigner.assignCurationWork(janneke, uuid) shouldBe a[Success[_]]
-    unassigner.unassignCurationWork(Some(janneke), Some(uuid)) shouldBe a[Success[_]]
-    unassigner.unassignCurationWork(Some(janneke), Some(uuid)).getOrElse("") should include(s"$uuid not found in the curation area of datamanager $janneke")
+  "unassigning a bagId that does not (anymore) exist in the personal curation area of a datamanager" should "fail" in {
+    assigner.assignCurationWork(janneke, bagId) shouldBe a[Success[_]]
+    unassigner.unassignCurationWork(Some(janneke), Some(bagId)) shouldBe a[Success[_]]
+    unassigner.unassignCurationWork(Some(janneke), Some(bagId)).getOrElse("") should include(s"$bagId not found in the curation area of datamanager $janneke")
   }
 
   "unassigning all deposits from a datamanager who does not yet have a personal curation area" should "fail" in {
@@ -80,21 +80,21 @@ class UnassignSpec extends TestSupportFixture {
   }
 
   "unassigning a deposit that is not in state 'submitted'" should "fail" in {
-    assigner.assignCurationWork(janneke, uuid) shouldBe a[Success[_]]
-    val depositPropertiesInPersonalCurationArea = new PropertiesConfiguration(jannekesCurationArea.resolve(uuid).resolve("deposit.properties").toFile)
+    assigner.assignCurationWork(janneke, bagId) shouldBe a[Success[_]]
+    val depositPropertiesInPersonalCurationArea = new PropertiesConfiguration(jannekesCurationArea.resolve(bagId).resolve("deposit.properties").toFile)
     depositPropertiesInPersonalCurationArea.setProperty("state.label", "NOT SUBMITTED")
     depositPropertiesInPersonalCurationArea.save()
 
-    unassigner.unassignCurationWork(Some(janneke), Some(uuid)).getOrElse("") should include(s"$uuid is not SUBMITTED. It was not unassigned")
+    unassigner.unassignCurationWork(Some(janneke), Some(bagId)).getOrElse("") should include(s"$bagId is not SUBMITTED. It was not unassigned")
   }
 
   "unassigning a deposit that is in state 'curation performed'" should "fail" in {
-    assigner.assignCurationWork(janneke, uuid) shouldBe a[Success[_]]
-    val depositPropertiesInPersonalCurationArea = new PropertiesConfiguration(jannekesCurationArea.resolve(uuid).resolve("deposit.properties").toFile)
+    assigner.assignCurationWork(janneke, bagId) shouldBe a[Success[_]]
+    val depositPropertiesInPersonalCurationArea = new PropertiesConfiguration(jannekesCurationArea.resolve(bagId).resolve("deposit.properties").toFile)
     depositPropertiesInPersonalCurationArea.setProperty("curation.performed", "yes")
     depositPropertiesInPersonalCurationArea.save()
 
-    unassigner.unassignCurationWork(Some(janneke), Some(uuid)).getOrElse("") should include(s"$uuid has already been curated. It was not unassigned")
+    unassigner.unassignCurationWork(Some(janneke), Some(bagId)).getOrElse("") should include(s"$bagId has already been curated. It was not unassigned")
   }
 
 }

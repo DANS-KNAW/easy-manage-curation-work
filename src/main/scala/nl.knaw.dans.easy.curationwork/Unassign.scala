@@ -77,8 +77,8 @@ class Unassign(commonCurationDir: Path, managerCurationDirString: String) extend
     }
   }
 
-  private def unassignFromDatamanager(personalCurationDirectory: Path, uuid: Option[Uuid], datamanager: DatamanagerId): String = {
-    uuid match {
+  private def unassignFromDatamanager(personalCurationDirectory: Path, bagId: Option[BagId], datamanager: DatamanagerId): String = {
+    bagId match {
       case Some(deposit) => unassignDeposit(personalCurationDirectory.resolve(deposit), datamanager)
       case None =>
         val msg = managed(Files.list(personalCurationDirectory)).acquireAndGet(jStream => jStream.iterator().asScala.toList)
@@ -90,25 +90,25 @@ class Unassign(commonCurationDir: Path, managerCurationDirString: String) extend
     }
   }
 
-  private def unassign(datamanager: DatamanagerId, uuid: Option[Uuid]): String = {
+  private def unassign(datamanager: DatamanagerId, bagId: Option[BagId]): String = {
     val curationDirectory = getCurationDirectory(Some(datamanager))
-    if (Files.exists(curationDirectory.resolve(uuid.getOrElse("")))) {
-      if (uuid.isEmpty && !confirmAction(datamanager))
+    if (Files.exists(curationDirectory.resolve(bagId.getOrElse("")))) {
+      if (bagId.isEmpty && !confirmAction(datamanager))
         s"\nAction cancelled"
       else
-        unassignFromDatamanager(curationDirectory, uuid, datamanager)
+        unassignFromDatamanager(curationDirectory, bagId, datamanager)
     }
     else
-      uuid match {
+      bagId match {
         case Some(deposit) => s"\nError: Deposit $deposit not found in the curation area of datamanager $datamanager."
         case None => s"\nError: No personal curation area found for datamanager $datamanager."
       }
   }
 
-  def unassignCurationWork(datamanager: Option[DatamanagerId] = None, uuid: Option[Uuid] = None): Try[String] = Try {
+  def unassignCurationWork(datamanager: Option[DatamanagerId] = None, bagId: Option[BagId] = None): Try[String] = Try {
     datamanager match {
-      case Some(dm) => unassign(dm, uuid)
-      case None => unassign(getCurrentUnixUser, uuid)
+      case Some(dm) => unassign(dm, bagId)
+      case None => unassign(getCurrentUnixUser, bagId)
     }
   }
 }

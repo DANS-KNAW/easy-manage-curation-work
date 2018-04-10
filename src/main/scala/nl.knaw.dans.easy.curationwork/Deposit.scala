@@ -16,7 +16,7 @@
 
 package nl.knaw.dans.easy.curationwork
 
-case class Deposit(bagId: Uuid,
+case class Deposit(bagId: BagId,
                    title: String,
                    depositor: DepositorId,
                    description: String,

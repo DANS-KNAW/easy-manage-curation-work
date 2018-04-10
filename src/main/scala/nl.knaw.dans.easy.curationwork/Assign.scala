@@ -34,24 +34,24 @@ class Assign(commonCurationDir: Path, managerCurationDirString: String, datamana
     depositProperties.save()
   }
 
-  private def assignToDatamanager(datamanager: DatamanagerId, personalCurationDirectory: Path, uuid: Uuid): String = {
-    if (Files.exists(personalCurationDirectory.resolve(uuid))) {
-      s"\nError: Deposit $uuid already exists in the personal curation area of datamanager $datamanager."
+  private def assignToDatamanager(datamanager: DatamanagerId, personalCurationDirectory: Path, bagId: BagId): String = {
+    if (Files.exists(personalCurationDirectory.resolve(bagId))) {
+      s"\nError: Deposit $bagId already exists in the personal curation area of datamanager $datamanager."
     } else {
-      val depositProperties = new PropertiesConfiguration(commonCurationDir.resolve(uuid).resolve("deposit.properties").toFile)
+      val depositProperties = new PropertiesConfiguration(commonCurationDir.resolve(bagId).resolve("deposit.properties").toFile)
       setProperties(depositProperties, datamanager)
-      FileUtils.moveDirectory(commonCurationDir.resolve(uuid).toFile, personalCurationDirectory.resolve(uuid).toFile)
-      s"\nDeposit $uuid has been assigned to datamanager $datamanager."
+      FileUtils.moveDirectory(commonCurationDir.resolve(bagId).toFile, personalCurationDirectory.resolve(bagId).toFile)
+      s"\nDeposit $bagId has been assigned to datamanager $datamanager."
     }
   }
 
-  def assignCurationWork(datamanager: DatamanagerId, uuid: Uuid): Try[String] = Try {
+  def assignCurationWork(datamanager: DatamanagerId, bagId: BagId): Try[String] = Try {
     val curationDirectory = getCurationDirectory(Some(datamanager))
-    if (Files.exists(commonCurationDir.resolve(uuid))) {
+    if (Files.exists(commonCurationDir.resolve(bagId))) {
       if (Files.exists(curationDirectory))
-        assignToDatamanager(datamanager, curationDirectory, uuid)
+        assignToDatamanager(datamanager, curationDirectory, bagId)
       else s"\nError: No personal curation area found for datamanager $datamanager."
     }
-    else s"\nError: Deposit $uuid not found in the common curation area."
+    else s"\nError: Deposit $bagId not found in the common curation area."
   }
 }

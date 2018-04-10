@@ -41,7 +41,7 @@ class AssignSpec extends TestSupportFixture {
 
   val janneke ="janneke"
   val jip ="jip"
-  val uuid = "38bc40f9-12d7-42c6-808a-8eac77bfc726"
+  val bagId = "38bc40f9-12d7-42c6-808a-8eac77bfc726"
 
 
   override def beforeEach(): Unit = {
@@ -52,34 +52,34 @@ class AssignSpec extends TestSupportFixture {
     jannekesCurationArea.toFile should exist
   }
 
-  "assign to existing datamanager with an existing uuid (in the common curation area)" should "succeed" in {
-    assigner.assignCurationWork(janneke, uuid).getOrElse("") should include(s"$uuid has been assigned to datamanager $janneke")
+  "assign to existing datamanager with an existing bagId (in the common curation area)" should "succeed" in {
+    assigner.assignCurationWork(janneke, bagId).getOrElse("") should include(s"$bagId has been assigned to datamanager $janneke")
   }
 
   "deposit properties" should "after assignment contain curation properties of the datamanager" in {
-    assigner.assignCurationWork(janneke, uuid) shouldBe a[Success[_]]
+    assigner.assignCurationWork(janneke, bagId) shouldBe a[Success[_]]
 
-    val depositPropertiesInPersonalCurationArea = new PropertiesConfiguration(jannekesCurationArea.resolve(uuid).resolve("deposit.properties").toFile)
+    val depositPropertiesInPersonalCurationArea = new PropertiesConfiguration(jannekesCurationArea.resolve(bagId).resolve("deposit.properties").toFile)
     depositPropertiesInPersonalCurationArea.getProperty("curation.datamanager.userId").toString should include("user001")
     depositPropertiesInPersonalCurationArea.getProperty("curation.datamanager.email").toString should include("janneke@dans.knaw.nl")
   }
 
   "assigning twice with the same parameters" should "fail" in {
-    assigner.assignCurationWork(janneke, uuid) shouldBe a[Success[_]]
-    assigner.assignCurationWork(janneke, uuid).getOrElse("") should include(s"Deposit $uuid not found in the common curation area")
+    assigner.assignCurationWork(janneke, bagId) shouldBe a[Success[_]]
+    assigner.assignCurationWork(janneke, bagId).getOrElse("") should include(s"Deposit $bagId not found in the common curation area")
   }
 
-  "assigning non-existing uuid" should "fail" in {
-    assigner.assignCurationWork(janneke, "non-existing-uuid").getOrElse("") should include(s"Deposit non-existing-uuid not found in the common curation area")
+  "assigning non-existing bagId" should "fail" in {
+    assigner.assignCurationWork(janneke, "non-existing-bagId").getOrElse("") should include(s"Deposit non-existing-bagId not found in the common curation area")
   }
 
-  "assigning a uuid that already exists in the personal curation area of a datamanager" should "fail" in {
-    FileUtils.copyDirectory(commonCurationArea.resolve(uuid).toFile, jannekesCurationArea.resolve(uuid).toFile)
-    assigner.assignCurationWork(janneke, uuid).getOrElse("") should include(s"Deposit $uuid already exists in the personal curation area of datamanager $janneke")
+  "assigning a bagId that already exists in the personal curation area of a datamanager" should "fail" in {
+    FileUtils.copyDirectory(commonCurationArea.resolve(bagId).toFile, jannekesCurationArea.resolve(bagId).toFile)
+    assigner.assignCurationWork(janneke, bagId).getOrElse("") should include(s"Deposit $bagId already exists in the personal curation area of datamanager $janneke")
   }
 
   "assigning to a datamanager who does not yet have a personal curation area" should "fail" in {
-    assigner.assignCurationWork(jip, uuid).getOrElse("") should include(s"No personal curation area found for datamanager $jip")
+    assigner.assignCurationWork(jip, bagId).getOrElse("") should include(s"No personal curation area found for datamanager $jip")
   }
 
 }

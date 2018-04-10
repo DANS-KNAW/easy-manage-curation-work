@@ -72,7 +72,7 @@ class Report(commonCurationDir: Path, managerCurationDirString: String) extends 
 
   def outputCurationList(deposits: Deposits): Unit = {
     val csvFormat: CSVFormat = CSVFormat.RFC4180
-      .withHeader("UUID", "TITLE", "DEPOSITOR", "DEPOSIT_CREATION_TIMESTAMP", "AUDIENCE")
+      .withHeader("BAG ID", "TITLE", "DEPOSITOR", "DEPOSIT_CREATION_TIMESTAMP", "AUDIENCE")
       .withDelimiter(',')
       .withRecordSeparator('\n')
     val printer = csvFormat.print(Console.out)

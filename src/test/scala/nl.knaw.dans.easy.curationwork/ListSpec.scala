@@ -43,7 +43,7 @@ class ListSpec extends TestSupportFixture {
 
   val janneke ="janneke"
   val jip ="jip"
-  val uuid = "38bc40f9-12d7-42c6-808a-8eac77bfc726"
+  val bagId = "38bc40f9-12d7-42c6-808a-8eac77bfc726"
 
   override def beforeEach(): Unit = {
     FileUtils.copyDirectory(Paths.get(getClass.getResource("/easy-common-curation-area").toURI).toFile, commonCurationArea.toFile)
@@ -58,12 +58,12 @@ class ListSpec extends TestSupportFixture {
   }
 
   "it" should "list three deposits after assigning a deposit to a datamanager" in {
-    assigner.assignCurationWork(janneke, uuid) shouldBe a[Success[_]]
+    assigner.assignCurationWork(janneke, bagId) shouldBe a[Success[_]]
     reporter.depositsFromCurationArea(reporter.listCurationArea(commonCurationArea)).toList should have size 3
   }
 
   "it" should "list one deposits in the personal curation area of the datamanager to whom the deposit was assigned" in {
-    assigner.assignCurationWork(janneke, uuid) shouldBe a[Success[_]]
+    assigner.assignCurationWork(janneke, bagId) shouldBe a[Success[_]]
     reporter.depositsFromCurationArea(reporter.listCurationArea(jannekesCurationArea)).toList should have size 1
   }
 
@@ -71,9 +71,9 @@ class ListSpec extends TestSupportFixture {
     reporter.listCurationWork(Some(jip)).getOrElse("") should include(s"No personal curation area found for datamanager $jip")
   }
 
-  "listing the common curation area" should s"contain details about deposit $uuid" in {
-    val deposit = reporter.depositsFromCurationArea(reporter.listCurationArea(commonCurationArea)).filter(deposit => deposit.bagId.equals(uuid)).head
-    deposit.bagId shouldBe uuid
+  "listing the common curation area" should s"contain details about deposit $bagId" in {
+    val deposit = reporter.depositsFromCurationArea(reporter.listCurationArea(commonCurationArea)).filter(deposit => deposit.bagId.equals(bagId)).head
+    deposit.bagId shouldBe bagId
     deposit.title shouldBe "Reis naar Centaur-planetoïde"
     deposit.depositor shouldBe "user001"
     deposit.creationTimestamp shouldBe "2018-02-27T11:32:42.204Z"
