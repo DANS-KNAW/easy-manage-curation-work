@@ -25,11 +25,11 @@ class CurationWorkSpec extends TestSupportFixture {
   val janneke ="janneke"
 
   "getCurationDirectory" should "return correct path to the personal curation area of a datamanager" in {
-    app.getCurationDirectory(Some(janneke)) shouldBe datamanagerCurationAreas.resolve(managerCurationDirString.replace("$unix-user", janneke))
+    app.getCurationDirectory(Some(janneke)).path shouldBe datamanagerCurationAreas.resolve(managerCurationDirString.replace("$unix-user", janneke))
   }
 
   "getCurationDirectory without datamanager parameter" should "return correct path to the common curation area" in {
-    app.getCurationDirectory(None) shouldBe commonCurationArea
+    app.getCurationDirectory(None).path shouldBe commonCurationArea
   }
 
 }

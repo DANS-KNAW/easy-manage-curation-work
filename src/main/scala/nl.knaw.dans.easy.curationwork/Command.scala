@@ -16,6 +16,7 @@
 package nl.knaw.dans.easy.curationwork
 
 import java.nio.file.Paths
+import better.files.File
 
 import nl.knaw.dans.lib.error._
 import nl.knaw.dans.lib.logging.DebugEnhancedLogging
@@ -31,9 +32,9 @@ object Command extends App with DebugEnhancedLogging {
   val commandLine: CommandLineOptions = new CommandLineOptions(args, configuration) {
     verify()
   }
-  val commonCurationArea = Paths.get(configuration.properties.getString("curation.common.directory"))
+  val commonCurationArea = File(configuration.properties.getString("curation.common.directory"))
   val managerCurationDirString = configuration.properties.getString("curation.personal.directory")
-  val datamanagerProperties = Configuration(Paths.get(System.getProperty("app.home"))).datamanagers
+  val datamanagerProperties = configuration.datamanagers
 
   val reporter = new Report(commonCurationArea, managerCurationDirString)
   val assigner = new Assign(commonCurationArea, managerCurationDirString, datamanagerProperties)

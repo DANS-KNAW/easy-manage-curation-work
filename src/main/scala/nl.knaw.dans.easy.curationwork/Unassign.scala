@@ -15,21 +15,18 @@
  */
 package nl.knaw.dans.easy.curationwork
 
-import java.nio.file.{Files, Path}
+import better.files.File
 
 import nl.knaw.dans.lib.logging.DebugEnhancedLogging
 import org.apache.commons.configuration.PropertiesConfiguration
-import org.apache.commons.io.FileUtils
-import resource.managed
 
 import scala.annotation.tailrec
-import scala.collection.JavaConverters._
 import scala.io.StdIn
 import scala.language.postfixOps
 import scala.sys.process._
 import scala.util.Try
 
-class Unassign(commonCurationDir: Path, managerCurationDirString: String) extends EasyManageCurationWorkApp(commonCurationDir, managerCurationDirString) with DebugEnhancedLogging {
+class Unassign(commonCurationDir: File, managerCurationDirString: String) extends EasyManageCurationWorkApp(commonCurationDir, managerCurationDirString) with DebugEnhancedLogging {
 
   private def getCurrentUnixUser: String = {
     "whoami" !!
@@ -60,8 +57,8 @@ class Unassign(commonCurationDir: Path, managerCurationDirString: String) extend
     }
   }
 
-  private def unassignDeposit(deposit: Path, datamanager: DatamanagerId): String = {
-    val depositProperties = new PropertiesConfiguration(deposit.resolve("deposit.properties").toFile)
+  private def unassignDeposit(deposit: File, datamanager: DatamanagerId): String = {
+    val depositProperties = new PropertiesConfiguration(deposit/"deposit.properties" toJava)
     if (!isSubmitted(depositProperties) || isCurated(depositProperties)) {
       var msg = ""
       if (!isSubmitted(depositProperties))
@@ -72,17 +69,17 @@ class Unassign(commonCurationDir: Path, managerCurationDirString: String) extend
     }
     else {
       clearProperties(depositProperties)
-      FileUtils.moveDirectory(deposit.toFile, commonCurationDir.resolve(deposit.getFileName).toFile)
+      deposit moveTo commonCurationDir/deposit.name
       s"\nDeposit $deposit has been unassigned from datamanager $datamanager."
     }
   }
 
-  private def unassignFromDatamanager(personalCurationDirectory: Path, bagId: Option[BagId], datamanager: DatamanagerId): String = {
+  private def unassignFromDatamanager(personalCurationDirectory: File, bagId: Option[BagId], datamanager: DatamanagerId): String = {
     bagId match {
-      case Some(deposit) => unassignDeposit(personalCurationDirectory.resolve(deposit), datamanager)
+      case Some(deposit) => unassignDeposit(personalCurationDirectory/deposit, datamanager)
       case None =>
-        val msg = managed(Files.list(personalCurationDirectory)).acquireAndGet(jStream => jStream.iterator().asScala.toList)
-          .filter(Files.isDirectory(_))
+        val msg = personalCurationDirectory.list.toList
+          .filter(_ isDirectory)
           .foldLeft("")((msg, deposit) => msg + unassignDeposit(deposit, datamanager))
 
         if (msg.isEmpty) "There were no deposits to unassign."
@@ -92,7 +89,7 @@ class Unassign(commonCurationDir: Path, managerCurationDirString: String) extend
 
   private def unassign(datamanager: DatamanagerId, bagId: Option[BagId]): String = {
     val curationDirectory = getCurationDirectory(Some(datamanager))
-    if (Files.exists(curationDirectory.resolve(bagId.getOrElse("")))) {
+    if (curationDirectory/bagId.getOrElse("") exists) {
       if (bagId.isEmpty && !confirmAction(datamanager))
         s"\nAction cancelled"
       else

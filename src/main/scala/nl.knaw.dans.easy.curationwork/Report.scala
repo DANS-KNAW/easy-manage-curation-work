@@ -15,30 +15,28 @@
  */
 package nl.knaw.dans.easy.curationwork
 
-import java.nio.file.{Files, Path}
+import better.files.File
 
 import org.apache.commons.configuration.PropertiesConfiguration
 import nl.knaw.dans.lib.logging.DebugEnhancedLogging
-import resource.managed
 import org.apache.commons.csv.CSVFormat
 
-import scala.collection.JavaConverters._
 import scala.language.postfixOps
 import scala.util.Try
 import scala.xml.XML
 
 
-class Report(commonCurationDir: Path, managerCurationDirString: String) extends EasyManageCurationWorkApp(commonCurationDir, managerCurationDirString) with DebugEnhancedLogging {
+class Report(commonCurationDir: File, managerCurationDirString: String) extends EasyManageCurationWorkApp(commonCurationDir, managerCurationDirString) with DebugEnhancedLogging {
 
-  def listCurationArea(path: Path): List[Path] = {
-    managed(Files.list(path)).acquireAndGet(stream => stream.iterator().asScala.toList)
+  def listCurationArea(dir: File): List[File] = {
+    dir.list.toList
   }
 
-  def depositsFromCurationArea(deposits: List[Path]): Deposits = {
-    deposits.filter(Files.isDirectory(_))
-      .flatMap { depositDirPath =>
-        //        debug(s"Getting info from $depositDirPath")
-        val depositProperties = new PropertiesConfiguration(depositDirPath.resolve("deposit.properties").toFile)
+  def depositsFromCurationArea(deposits: List[File]): Deposits = {
+    deposits.filter(_.isDirectory)
+      .flatMap { depositDir =>
+        //        debug(s"Getting info from $depositDir")
+        val depositProperties = new PropertiesConfiguration(depositDir/"deposit.properties" toJava)
         val depositorId = depositProperties.getString("depositor.userId")
         val submitted = depositProperties.getString("state.label") == "SUBMITTED"
         val curationRequired = depositProperties.getString("curation.required") == "yes"
@@ -47,9 +45,9 @@ class Report(commonCurationDir: Path, managerCurationDirString: String) extends 
         if (submitted && curationRequired && !curationPerformed) Some {
 
           // get the bag directory; it is expected that there is exactly one directory to be found
-          val bagDir = managed(Files.list(depositDirPath)).acquireAndGet(stream => stream.iterator().asScala.toList).filter(Files.isDirectory(_)).head
+          val bagDir = depositDir.list.toList.filter(_.isDirectory).head
 
-          val xml = XML.loadFile(bagDir.resolve("metadata/dataset.xml").toFile)
+          val xml = XML.loadFile(bagDir/"metadata/dataset.xml" toJava)
           val titles = xml \\ "title"
           val title = titles.headOption.map(_.text).getOrElse("n/a").toString
           val audiences = xml \\ "audience"
@@ -72,7 +70,7 @@ class Report(commonCurationDir: Path, managerCurationDirString: String) extends 
 
   def outputCurationList(deposits: Deposits): Unit = {
     val csvFormat: CSVFormat = CSVFormat.RFC4180
-      .withHeader("BAG ID", "TITLE", "DEPOSITOR", "DEPOSIT_CREATION_TIMESTAMP", "AUDIENCE")
+      .withHeader("BAG_ID", "TITLE", "DEPOSITOR", "DEPOSIT_CREATION_TIMESTAMP", "AUDIENCE")
       .withDelimiter(',')
       .withRecordSeparator('\n')
     val printer = csvFormat.print(Console.out)
@@ -88,7 +86,7 @@ class Report(commonCurationDir: Path, managerCurationDirString: String) extends 
 
   def listCurationWork(datamanager: Option[DatamanagerId] = None): Try[String] = Try {
     val curationDirectory = getCurationDirectory(datamanager)
-    if (Files.exists((curationDirectory))) {
+    if (curationDirectory exists) {
       outputCurationList(depositsFromCurationArea(listCurationArea(curationDirectory)))
       s"\nEnd of curation list."
     }

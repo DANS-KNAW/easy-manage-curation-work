@@ -15,19 +15,20 @@
  */
 package nl.knaw.dans.easy.curationwork
 
-import java.nio.file.{ Path, Paths }
+import better.files.File
+
 import nl.knaw.dans.lib.logging.DebugEnhancedLogging
 import scala.language.postfixOps
 
 
-class EasyManageCurationWorkApp(val commonCurationDir: Path, val managerCurationDirString: String) extends DebugEnhancedLogging {
+class EasyManageCurationWorkApp(val commonCurationDir: File, val managerCurationDirString: String) extends DebugEnhancedLogging {
 
-  def getCurationDirectory(datamanager: Option[DatamanagerId]): Path = {
+  def getCurationDirectory(datamanager: Option[DatamanagerId]): File = {
     datamanager.map(getManagerCurationDir).getOrElse(commonCurationDir)
   }
 
-  private def getManagerCurationDir(datamanager: DatamanagerId): Path = {
-    Paths.get(managerCurationDirString.replace("$unix-user", datamanager))
+  private def getManagerCurationDir(datamanager: DatamanagerId): File = {
+    File(managerCurationDirString.replace("$unix-user", datamanager))
   }
 
 }
