@@ -66,6 +66,6 @@ object Command extends App with DebugEnhancedLogging {
   }
 
   private def validDatamanager(datamanager: Option[DatamanagerId]): Boolean = {
-    datamanager.isEmpty || datamanagerProperties.getKeys(datamanager.getOrElse("") + EASY_USER_ID_SUFFIX).hasNext
+    datamanager.isEmpty || datamanagerProperties.containsKey(datamanager.get + EASY_USER_ID_SUFFIX)
   }
 }
