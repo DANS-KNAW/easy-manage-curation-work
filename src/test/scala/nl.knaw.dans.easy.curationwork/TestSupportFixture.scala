@@ -16,12 +16,13 @@
 package nl.knaw.dans.easy.curationwork
 
 import better.files.File
+import better.files.File.currentWorkingDirectory
 import org.scalatest.{ BeforeAndAfterEach, FlatSpec, Inside, Matchers }
 
 trait TestSupportFixture extends FlatSpec with Matchers with Inside with BeforeAndAfterEach {
 
   lazy val testDir: File = {
-    val file = File(s"target/test/${ getClass.getSimpleName }")
+    val file = currentWorkingDirectory / "target" / "test" / getClass.getSimpleName
     file.delete(true)
     file.createDirectories()
     file
