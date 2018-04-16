@@ -40,7 +40,7 @@ class Assign(commonCurationDir: File, managerCurationDirString: String, datamana
       val depositProperties = new PropertiesConfiguration((commonCurationDir / bagId / "deposit.properties").toJava)
       setProperties(depositProperties, datamanager)
       commonCurationDir / bagId moveTo personalCurationDirectory / bagId
-      s"\nDeposit $bagId has been assigned to datamanager $datamanager."
+      s"Deposit $bagId has been assigned to datamanager $datamanager."
     }
   }
 
@@ -49,8 +49,8 @@ class Assign(commonCurationDir: File, managerCurationDirString: String, datamana
     if (commonCurationDir / bagId exists) {
       if (curationDirectory exists)
         assignToDatamanager(datamanager, curationDirectory, bagId)
-      else s"\nError: No personal curation area found for datamanager $datamanager."
+      else s"Error: No personal curation area found for datamanager $datamanager."
     }
-    else s"\nError: Deposit $bagId not found in the common curation area."
+    else s"Error: Deposit $bagId not found in the common curation area."
   }
 }

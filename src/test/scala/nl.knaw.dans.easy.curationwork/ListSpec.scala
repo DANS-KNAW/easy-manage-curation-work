@@ -79,5 +79,4 @@ class ListSpec extends TestSupportFixture {
     deposit.creationTimestamp shouldBe "2018-02-27T11:32:42.204Z"
     deposit.audience shouldBe "D30000"
   }
-
 }

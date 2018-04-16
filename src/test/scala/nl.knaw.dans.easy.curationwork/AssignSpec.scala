@@ -81,5 +81,4 @@ class AssignSpec extends TestSupportFixture {
   "assigning to a datamanager who does not yet have a personal curation area" should "fail" in {
     assigner.assignCurationWork(jip, bagId).getOrElse("") should include(s"No personal curation area found for datamanager $jip")
   }
-
 }

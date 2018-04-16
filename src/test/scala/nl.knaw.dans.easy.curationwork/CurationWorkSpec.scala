@@ -33,5 +33,4 @@ class CurationWorkSpec extends TestSupportFixture {
   "getCurationDirectory without datamanager parameter" should "return correct path to the common curation area" in {
     app.getCurationDirectory(None) shouldBe commonCurationArea
   }
-
 }

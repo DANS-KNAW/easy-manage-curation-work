@@ -30,5 +30,4 @@ class EasyManageCurationWorkApp(val commonCurationDir: File, val managerCuration
   private def getManagerCurationDir(datamanager: DatamanagerId): File = {
     File(managerCurationDirString.replace("$unix-user", datamanager))
   }
-
 }

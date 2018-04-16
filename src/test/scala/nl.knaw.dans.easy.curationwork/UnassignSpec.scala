@@ -96,5 +96,4 @@ class UnassignSpec extends TestSupportFixture {
 
     unassigner.unassignCurationWork(Some(janneke), Some(bagId)).getOrElse("") should include(s"$bagId has already been curated. It was not unassigned")
   }
-
 }

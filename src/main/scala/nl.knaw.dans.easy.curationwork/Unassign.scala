@@ -69,7 +69,7 @@ class Unassign(commonCurationDir: File, managerCurationDirString: String) extend
     else {
       clearProperties(depositProperties)
       deposit moveTo commonCurationDir / deposit.name
-      s"\nDeposit $deposit has been unassigned from datamanager $datamanager."
+      s"\nDeposit ${deposit.name} has been unassigned from datamanager $datamanager."
     }
   }
 
@@ -90,14 +90,14 @@ class Unassign(commonCurationDir: File, managerCurationDirString: String) extend
     val curationDirectory = getCurationDirectory(Some(datamanager))
     if (curationDirectory / bagId.getOrElse("") exists) {
       if (bagId.isEmpty && !confirmAction(datamanager))
-        s"\nAction cancelled"
+        s"Action cancelled"
       else
         unassignFromDatamanager(curationDirectory, bagId, datamanager)
     }
     else
       bagId match {
-        case Some(deposit) => s"\nError: Deposit $deposit not found in the curation area of datamanager $datamanager."
-        case None => s"\nError: No personal curation area found for datamanager $datamanager."
+        case Some(deposit) => s"Error: Deposit $deposit not found in the curation area of datamanager $datamanager."
+        case None => s"Error: No personal curation area found for datamanager $datamanager."
       }
   }
 

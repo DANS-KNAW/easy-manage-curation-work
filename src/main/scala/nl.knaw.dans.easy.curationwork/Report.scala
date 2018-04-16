@@ -87,8 +87,8 @@ class Report(commonCurationDir: File, managerCurationDirString: String) extends 
     val curationDirectory = getCurationDirectory(datamanager)
     if (curationDirectory exists) {
       outputCurationList(depositsFromCurationArea(listCurationArea(curationDirectory)))
-      s"\nEnd of curation list."
+      s"End of curation list."
     }
-    else s"\nError: No personal curation area found for datamanager ${ datamanager.getOrElse("") }."
+    else s"Error: No personal curation area found for datamanager ${ datamanager.getOrElse("") }."
   }
 }
