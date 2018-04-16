@@ -16,9 +16,8 @@
 package nl.knaw.dans.easy.curationwork
 
 import better.files.File
-
-import org.apache.commons.configuration.PropertiesConfiguration
 import nl.knaw.dans.lib.logging.DebugEnhancedLogging
+import org.apache.commons.configuration.PropertiesConfiguration
 import org.apache.commons.csv.CSVFormat
 
 import scala.language.postfixOps
@@ -36,7 +35,7 @@ class Report(commonCurationDir: File, managerCurationDirString: String) extends 
     deposits.filter(_.isDirectory)
       .flatMap { depositDir =>
         //        debug(s"Getting info from $depositDir")
-        val depositProperties = new PropertiesConfiguration(depositDir/"deposit.properties" toJava)
+        val depositProperties = new PropertiesConfiguration(depositDir / "deposit.properties" toJava)
         val depositorId = depositProperties.getString("depositor.userId")
         val submitted = depositProperties.getString("state.label") == "SUBMITTED"
         val curationRequired = depositProperties.getString("curation.required") == "yes"
@@ -47,7 +46,7 @@ class Report(commonCurationDir: File, managerCurationDirString: String) extends 
           // get the bag directory; it is expected that there is exactly one directory to be found
           val bagDir = depositDir.list.toList.filter(_.isDirectory).head
 
-          val xml = XML.loadFile(bagDir/"metadata/dataset.xml" toJava)
+          val xml = XML.loadFile(bagDir / "metadata/dataset.xml" toJava)
           val titles = xml \\ "title"
           val title = titles.headOption.map(_.text).getOrElse("n/a").toString
           val audiences = xml \\ "audience"
@@ -90,6 +89,6 @@ class Report(commonCurationDir: File, managerCurationDirString: String) extends 
       outputCurationList(depositsFromCurationArea(listCurationArea(curationDirectory)))
       s"\nEnd of curation list."
     }
-    else s"\nError: No personal curation area found for datamanager ${datamanager.getOrElse("")}."
+    else s"\nError: No personal curation area found for datamanager ${ datamanager.getOrElse("") }."
   }
 }

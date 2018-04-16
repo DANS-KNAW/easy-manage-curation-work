@@ -15,21 +15,23 @@
  */
 package nl.knaw.dans.easy.curationwork
 
+import scala.language.postfixOps
+
 class CurationWorkSpec extends TestSupportFixture {
 
-  val commonCurationArea = testDir.resolve("easy-common-curation-area")
-  val datamanagerCurationAreas = testDir.resolve("datamanager-curation-areas")
-  val managerCurationDirString = datamanagerCurationAreas.resolve("$unix-user/curation-area").toString
+  val commonCurationArea = testDir / "easy-common-curation-area"
+  val datamanagerCurationAreas = testDir / "datamanager-curation-areas"
+  val managerCurationDirString = datamanagerCurationAreas / "$unix-user/curation-area" toString
 
   val app = new EasyManageCurationWorkApp(commonCurationArea, managerCurationDirString)
-  val janneke ="janneke"
+  val janneke = "janneke"
 
   "getCurationDirectory" should "return correct path to the personal curation area of a datamanager" in {
-    app.getCurationDirectory(Some(janneke)).path shouldBe datamanagerCurationAreas.resolve(managerCurationDirString.replace("$unix-user", janneke))
+    app.getCurationDirectory(Some(janneke)) shouldBe datamanagerCurationAreas / managerCurationDirString.replace("$unix-user", janneke)
   }
 
   "getCurationDirectory without datamanager parameter" should "return correct path to the common curation area" in {
-    app.getCurationDirectory(None).path shouldBe commonCurationArea
+    app.getCurationDirectory(None) shouldBe commonCurationArea
   }
 
 }

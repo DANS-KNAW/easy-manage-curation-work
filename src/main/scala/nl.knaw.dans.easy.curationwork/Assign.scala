@@ -16,14 +16,13 @@
 package nl.knaw.dans.easy.curationwork
 
 import better.files.File
-
 import nl.knaw.dans.lib.logging.DebugEnhancedLogging
 import org.apache.commons.configuration.PropertiesConfiguration
 
 import scala.language.postfixOps
 import scala.util.Try
 
-class Assign(commonCurationDir: File, managerCurationDirString: String, datamanagerProperties: PropertiesConfiguration) extends EasyManageCurationWorkApp(commonCurationDir, managerCurationDirString) with DebugEnhancedLogging  {
+class Assign(commonCurationDir: File, managerCurationDirString: String, datamanagerProperties: PropertiesConfiguration) extends EasyManageCurationWorkApp(commonCurationDir, managerCurationDirString) with DebugEnhancedLogging {
 
   private def setProperties(depositProperties: PropertiesConfiguration, datamanager: String): Unit = {
     val userId = datamanagerProperties.getString(datamanager + EASY_USER_ID_SUFFIX)
@@ -34,19 +33,20 @@ class Assign(commonCurationDir: File, managerCurationDirString: String, datamana
   }
 
   private def assignToDatamanager(datamanager: DatamanagerId, personalCurationDirectory: File, bagId: BagId): String = {
-    if (personalCurationDirectory/bagId exists) {
+    if (personalCurationDirectory / bagId exists) {
       s"\nError: Deposit $bagId already exists in the personal curation area of datamanager $datamanager."
-    } else {
-      val depositProperties = new PropertiesConfiguration((commonCurationDir/bagId/"deposit.properties").toJava)
+    }
+    else {
+      val depositProperties = new PropertiesConfiguration((commonCurationDir / bagId / "deposit.properties").toJava)
       setProperties(depositProperties, datamanager)
-      commonCurationDir/bagId moveTo personalCurationDirectory/bagId
+      commonCurationDir / bagId moveTo personalCurationDirectory / bagId
       s"\nDeposit $bagId has been assigned to datamanager $datamanager."
     }
   }
 
   def assignCurationWork(datamanager: DatamanagerId, bagId: BagId): Try[String] = Try {
     val curationDirectory = getCurationDirectory(Some(datamanager))
-    if (commonCurationDir/bagId exists) {
+    if (commonCurationDir / bagId exists) {
       if (curationDirectory exists)
         assignToDatamanager(datamanager, curationDirectory, bagId)
       else s"\nError: No personal curation area found for datamanager $datamanager."

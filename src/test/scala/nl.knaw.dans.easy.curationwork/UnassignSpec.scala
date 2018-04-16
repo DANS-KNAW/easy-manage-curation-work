@@ -15,41 +15,41 @@
  */
 package nl.knaw.dans.easy.curationwork
 
-import java.nio.file.{ Files, Paths }
-
+import better.files.File
 import org.apache.commons.configuration.PropertiesConfiguration
-import org.apache.commons.io.FileUtils
 
+import scala.language.postfixOps
 import scala.util.Success
 
 class UnassignSpec extends TestSupportFixture {
 
-  val resourceDirString: String = Paths.get(getClass.getResource("/").toURI).toAbsolutePath.toString
+  val resourceDir = File(getClass.getResource("/"))
   val datamanagerProperties = new Configuration("version x.y.z",
     new PropertiesConfiguration() {},
     new PropertiesConfiguration() {
       setDelimiterParsingDisabled(true)
-      load(Paths.get(resourceDirString + "/debug-config", "datamanager.properties").toFile)
+      load(resourceDir / "debug-config" / "datamanager.properties" toJava)
     }).datamanagers
 
-  val commonCurationArea = testDir.resolve("easy-common-curation-area")
-  val datamanagerCurationAreas = testDir.resolve("datamanager-curation-areas")
-  val managerCurationDirString = datamanagerCurationAreas.resolve("$unix-user/curation-area").toString
-  val jannekesCurationArea = datamanagerCurationAreas.resolve("janneke/curation-area")
+  val commonCurationArea = testDir / "easy-common-curation-area"
+  val datamanagerCurationAreas = testDir / "datamanager-curation-areas"
+  val managerCurationDirString = datamanagerCurationAreas / "$unix-user/curation-area" toString
+  val jannekesCurationArea = datamanagerCurationAreas / "janneke/curation-area"
 
   val assigner = new Assign(commonCurationArea, managerCurationDirString, datamanagerProperties)
   val unassigner = new Unassign(commonCurationArea, managerCurationDirString)
 
-  val janneke ="janneke"
-  val jip ="jip"
+  val janneke = "janneke"
+  val jip = "jip"
   val bagId = "38bc40f9-12d7-42c6-808a-8eac77bfc726"
 
   override def beforeEach(): Unit = {
-    FileUtils.copyDirectory(Paths.get(getClass.getResource("/easy-common-curation-area").toURI).toFile, commonCurationArea.toFile)
-    FileUtils.deleteQuietly(jannekesCurationArea.toFile)
-    Files.createDirectories(jannekesCurationArea)
-    commonCurationArea.toFile should exist
-    jannekesCurationArea.toFile should exist
+    commonCurationArea delete (true)
+    jannekesCurationArea delete (true)
+    File(getClass.getResource("/easy-common-curation-area")) copyTo commonCurationArea
+    jannekesCurationArea.createDirectories()
+    commonCurationArea.toJava should exist
+    jannekesCurationArea.toJava should exist
   }
 
   "unassign from an existing datamanager with an existing bagId (in the personal curation area)" should "succeed" in {
@@ -59,12 +59,12 @@ class UnassignSpec extends TestSupportFixture {
 
   "after unassigning a deposit, deposit properties" should "not anymore contain curator properties" in {
     assigner.assignCurationWork(janneke, bagId) shouldBe a[Success[_]]
-    val depositPropertiesInPersonalCurationArea = new PropertiesConfiguration(jannekesCurationArea.resolve(bagId).resolve("deposit.properties").toFile)
+    val depositPropertiesInPersonalCurationArea = new PropertiesConfiguration(jannekesCurationArea / bagId / "deposit.properties" toJava)
     depositPropertiesInPersonalCurationArea.getProperty("curation.datamanager.userId").toString should include("user001")
     depositPropertiesInPersonalCurationArea.getProperty("curation.datamanager.email").toString should include("janneke@dans.knaw.nl")
 
     unassigner.unassignCurationWork(Some(janneke), Some(bagId)) shouldBe a[Success[_]]
-    val depositPropertiesInCommonCurationArea = new PropertiesConfiguration(commonCurationArea.resolve(bagId).resolve("deposit.properties").toFile)
+    val depositPropertiesInCommonCurationArea = new PropertiesConfiguration(commonCurationArea / bagId / "deposit.properties" toJava)
     depositPropertiesInCommonCurationArea.getProperty("curation.datamanager.userId") shouldBe null
     depositPropertiesInCommonCurationArea.getProperty("curation.datamanager.email") shouldBe null
   }
@@ -81,7 +81,7 @@ class UnassignSpec extends TestSupportFixture {
 
   "unassigning a deposit that is not in state 'submitted'" should "fail" in {
     assigner.assignCurationWork(janneke, bagId) shouldBe a[Success[_]]
-    val depositPropertiesInPersonalCurationArea = new PropertiesConfiguration(jannekesCurationArea.resolve(bagId).resolve("deposit.properties").toFile)
+    val depositPropertiesInPersonalCurationArea = new PropertiesConfiguration(jannekesCurationArea / bagId / "deposit.properties" toJava)
     depositPropertiesInPersonalCurationArea.setProperty("state.label", "NOT SUBMITTED")
     depositPropertiesInPersonalCurationArea.save()
 
@@ -90,7 +90,7 @@ class UnassignSpec extends TestSupportFixture {
 
   "unassigning a deposit that is in state 'curation performed'" should "fail" in {
     assigner.assignCurationWork(janneke, bagId) shouldBe a[Success[_]]
-    val depositPropertiesInPersonalCurationArea = new PropertiesConfiguration(jannekesCurationArea.resolve(bagId).resolve("deposit.properties").toFile)
+    val depositPropertiesInPersonalCurationArea = new PropertiesConfiguration(jannekesCurationArea / bagId / "deposit.properties" toJava)
     depositPropertiesInPersonalCurationArea.setProperty("curation.performed", "yes")
     depositPropertiesInPersonalCurationArea.save()
 

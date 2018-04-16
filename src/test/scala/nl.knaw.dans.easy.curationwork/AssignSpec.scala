@@ -15,41 +15,41 @@
  */
 package nl.knaw.dans.easy.curationwork
 
-import java.nio.file.{ Files, Paths }
-
+import better.files.File
 import org.apache.commons.configuration.PropertiesConfiguration
-import org.apache.commons.io.FileUtils
 
+import scala.language.postfixOps
 import scala.util.Success
 
 class AssignSpec extends TestSupportFixture {
 
-  val resourceDirString: String = Paths.get(getClass.getResource("/").toURI).toAbsolutePath.toString
+  val resourceDir = File(getClass.getResource("/"))
   val datamanagerProperties = new Configuration("version x.y.z",
     new PropertiesConfiguration() {},
     new PropertiesConfiguration() {
       setDelimiterParsingDisabled(true)
-      load(Paths.get(resourceDirString + "/debug-config", "datamanager.properties").toFile)
+      load(resourceDir / "debug-config" / "datamanager.properties" toJava)
     }).datamanagers
 
-  val commonCurationArea = testDir.resolve("easy-common-curation-area")
-  val datamanagerCurationAreas = testDir.resolve("datamanager-curation-areas")
-  val managerCurationDirString = datamanagerCurationAreas.resolve("$unix-user/curation-area").toString
-  val jannekesCurationArea = datamanagerCurationAreas.resolve("janneke/curation-area")
+  val commonCurationArea = testDir / "easy-common-curation-area"
+  val datamanagerCurationAreas = testDir / "datamanager-curation-areas"
+  val managerCurationDirString = datamanagerCurationAreas / "$unix-user/curation-area" toString
+  val jannekesCurationArea = datamanagerCurationAreas / "janneke/curation-area"
 
   val assigner = new Assign(commonCurationArea, managerCurationDirString, datamanagerProperties)
 
-  val janneke ="janneke"
-  val jip ="jip"
+  val janneke = "janneke"
+  val jip = "jip"
   val bagId = "38bc40f9-12d7-42c6-808a-8eac77bfc726"
 
 
   override def beforeEach(): Unit = {
-    FileUtils.copyDirectory(Paths.get(getClass.getResource("/easy-common-curation-area").toURI).toFile, commonCurationArea.toFile)
-    FileUtils.deleteQuietly(jannekesCurationArea.toFile)
-    Files.createDirectories(jannekesCurationArea)
-    commonCurationArea.toFile should exist
-    jannekesCurationArea.toFile should exist
+    commonCurationArea delete (true)
+    jannekesCurationArea delete (true)
+    File(getClass.getResource("/easy-common-curation-area")) copyTo commonCurationArea
+    jannekesCurationArea.createDirectories()
+    commonCurationArea.toJava should exist
+    jannekesCurationArea.toJava should exist
   }
 
   "assign to existing datamanager with an existing bagId (in the common curation area)" should "succeed" in {
@@ -59,7 +59,7 @@ class AssignSpec extends TestSupportFixture {
   "deposit properties" should "after assignment contain curation properties of the datamanager" in {
     assigner.assignCurationWork(janneke, bagId) shouldBe a[Success[_]]
 
-    val depositPropertiesInPersonalCurationArea = new PropertiesConfiguration(jannekesCurationArea.resolve(bagId).resolve("deposit.properties").toFile)
+    val depositPropertiesInPersonalCurationArea = new PropertiesConfiguration(jannekesCurationArea / bagId / "deposit.properties" toJava)
     depositPropertiesInPersonalCurationArea.getProperty("curation.datamanager.userId").toString should include("user001")
     depositPropertiesInPersonalCurationArea.getProperty("curation.datamanager.email").toString should include("janneke@dans.knaw.nl")
   }
@@ -74,7 +74,7 @@ class AssignSpec extends TestSupportFixture {
   }
 
   "assigning a bagId that already exists in the personal curation area of a datamanager" should "fail" in {
-    FileUtils.copyDirectory(commonCurationArea.resolve(bagId).toFile, jannekesCurationArea.resolve(bagId).toFile)
+    commonCurationArea / bagId copyTo jannekesCurationArea / bagId
     assigner.assignCurationWork(janneke, bagId).getOrElse("") should include(s"Deposit $bagId already exists in the personal curation area of datamanager $janneke")
   }
 

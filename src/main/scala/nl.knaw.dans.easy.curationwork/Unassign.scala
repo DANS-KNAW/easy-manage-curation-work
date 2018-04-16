@@ -16,7 +16,6 @@
 package nl.knaw.dans.easy.curationwork
 
 import better.files.File
-
 import nl.knaw.dans.lib.logging.DebugEnhancedLogging
 import org.apache.commons.configuration.PropertiesConfiguration
 
@@ -58,7 +57,7 @@ class Unassign(commonCurationDir: File, managerCurationDirString: String) extend
   }
 
   private def unassignDeposit(deposit: File, datamanager: DatamanagerId): String = {
-    val depositProperties = new PropertiesConfiguration(deposit/"deposit.properties" toJava)
+    val depositProperties = new PropertiesConfiguration(deposit / "deposit.properties" toJava)
     if (!isSubmitted(depositProperties) || isCurated(depositProperties)) {
       var msg = ""
       if (!isSubmitted(depositProperties))
@@ -69,14 +68,14 @@ class Unassign(commonCurationDir: File, managerCurationDirString: String) extend
     }
     else {
       clearProperties(depositProperties)
-      deposit moveTo commonCurationDir/deposit.name
+      deposit moveTo commonCurationDir / deposit.name
       s"\nDeposit $deposit has been unassigned from datamanager $datamanager."
     }
   }
 
   private def unassignFromDatamanager(personalCurationDirectory: File, bagId: Option[BagId], datamanager: DatamanagerId): String = {
     bagId match {
-      case Some(deposit) => unassignDeposit(personalCurationDirectory/deposit, datamanager)
+      case Some(deposit) => unassignDeposit(personalCurationDirectory / deposit, datamanager)
       case None =>
         val msg = personalCurationDirectory.list.toList
           .filter(_ isDirectory)
@@ -89,7 +88,7 @@ class Unassign(commonCurationDir: File, managerCurationDirString: String) extend
 
   private def unassign(datamanager: DatamanagerId, bagId: Option[BagId]): String = {
     val curationDirectory = getCurationDirectory(Some(datamanager))
-    if (curationDirectory/bagId.getOrElse("") exists) {
+    if (curationDirectory / bagId.getOrElse("") exists) {
       if (bagId.isEmpty && !confirmAction(datamanager))
         s"\nAction cancelled"
       else

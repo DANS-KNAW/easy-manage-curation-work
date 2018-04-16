@@ -15,42 +15,42 @@
  */
 package nl.knaw.dans.easy.curationwork
 
-import java.nio.file.{ Files, Paths }
-
+import better.files.File
 import org.apache.commons.configuration.PropertiesConfiguration
-import org.apache.commons.io.FileUtils
 
+import scala.language.postfixOps
 import scala.util.Success
 
 class ListSpec extends TestSupportFixture {
 
-  val resourceDirString: String = Paths.get(getClass.getResource("/").toURI).toAbsolutePath.toString
+  val resourceDir = File(getClass.getResource("/"))
   val datamanagerProperties = new Configuration("version x.y.z",
     new PropertiesConfiguration() {},
     new PropertiesConfiguration() {
       setDelimiterParsingDisabled(true)
-      load(Paths.get(resourceDirString + "/debug-config", "datamanager.properties").toFile)
+      load(resourceDir / "debug-config" / "datamanager.properties" toJava)
     }).datamanagers
 
 
-  val commonCurationArea = testDir.resolve("easy-common-curation-area")
-  val datamanagerCurationAreas = testDir.resolve("datamanager-curation-areas")
-  val managerCurationDirString = datamanagerCurationAreas.resolve("$unix-user/curation-area").toString
-  val jannekesCurationArea = datamanagerCurationAreas.resolve("janneke/curation-area")
+  val commonCurationArea = testDir / "easy-common-curation-area"
+  val datamanagerCurationAreas = testDir / "datamanager-curation-areas"
+  val managerCurationDirString = datamanagerCurationAreas / "$unix-user/curation-area" toString
+  val jannekesCurationArea = datamanagerCurationAreas / "janneke/curation-area"
 
   val assigner = new Assign(commonCurationArea, managerCurationDirString, datamanagerProperties)
   val reporter = new Report(commonCurationArea, managerCurationDirString)
 
-  val janneke ="janneke"
-  val jip ="jip"
+  val janneke = "janneke"
+  val jip = "jip"
   val bagId = "38bc40f9-12d7-42c6-808a-8eac77bfc726"
 
   override def beforeEach(): Unit = {
-    FileUtils.copyDirectory(Paths.get(getClass.getResource("/easy-common-curation-area").toURI).toFile, commonCurationArea.toFile)
-    FileUtils.deleteQuietly(jannekesCurationArea.toFile)
-    Files.createDirectories(jannekesCurationArea)
-    commonCurationArea.toFile should exist
-    jannekesCurationArea.toFile should exist
+    commonCurationArea delete (true)
+    jannekesCurationArea delete (true)
+    File(getClass.getResource("/easy-common-curation-area")) copyTo commonCurationArea
+    jannekesCurationArea.createDirectories()
+    commonCurationArea.toJava should exist
+    jannekesCurationArea.toJava should exist
   }
 
   "list without datamanager parameter" should "list four deposits" in {

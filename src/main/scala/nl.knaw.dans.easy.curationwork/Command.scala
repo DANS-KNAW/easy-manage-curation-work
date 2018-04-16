@@ -16,8 +16,8 @@
 package nl.knaw.dans.easy.curationwork
 
 import java.nio.file.Paths
-import better.files.File
 
+import better.files.File
 import nl.knaw.dans.lib.error._
 import nl.knaw.dans.lib.logging.DebugEnhancedLogging
 
@@ -50,13 +50,13 @@ object Command extends App with DebugEnhancedLogging {
       .collect {
         case cmd @ commandLine.list =>
           if (validDatamanager(cmd.datamanager.toOption)) reporter.listCurationWork(cmd.datamanager.toOption)
-          else Try(s"Error: Unknown datamanager ${cmd.datamanager()} (missing in datamanager properties file)")
+          else Try(s"Error: Unknown datamanager ${ cmd.datamanager() } (missing in datamanager properties file)")
         case cmd @ commandLine.assign =>
           if (userIdAndEmailExist(cmd.datamanager())) assigner.assignCurationWork(cmd.datamanager(), cmd.bagId())
-          else Try(s"Error: Easy-userid and/or email address of datamanager ${cmd.datamanager()} missing in datamanager properties file")
+          else Try(s"Error: Easy-userid and/or email address of datamanager ${ cmd.datamanager() } missing in datamanager properties file")
         case cmd @ commandLine.unassign =>
           if (validDatamanager(cmd.datamanager.toOption)) unassigner.unassignCurationWork(cmd.datamanager.toOption, cmd.bagId.toOption)
-          else Try(s"Unknown datamanager ${cmd.datamanager()} (missing in datamanager properties file)")
+          else Try(s"Unknown datamanager ${ cmd.datamanager() } (missing in datamanager properties file)")
       }
       .getOrElse(Failure(new IllegalArgumentException(s"Unknown command: ${ commandLine.subcommand }")))
   }

@@ -16,8 +16,8 @@
 package nl.knaw.dans.easy.curationwork
 
 import better.files.File
-
 import nl.knaw.dans.lib.logging.DebugEnhancedLogging
+
 import scala.language.postfixOps
 
 

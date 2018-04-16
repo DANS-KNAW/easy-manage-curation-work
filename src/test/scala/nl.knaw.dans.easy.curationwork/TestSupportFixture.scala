@@ -15,17 +15,15 @@
  */
 package nl.knaw.dans.easy.curationwork
 
-import java.nio.file.{ Files, Path, Paths }
-
-import org.apache.commons.io.FileUtils
+import better.files.File
 import org.scalatest.{ BeforeAndAfterEach, FlatSpec, Inside, Matchers }
 
 trait TestSupportFixture extends FlatSpec with Matchers with Inside with BeforeAndAfterEach {
 
-  lazy val testDir: Path = {
-    val path = Paths.get(s"target/test/${ getClass.getSimpleName }").toAbsolutePath
-    FileUtils.deleteQuietly(path.toFile)
-    Files.createDirectories(path)
-    path
+  lazy val testDir: File = {
+    val file = File(s"target/test/${ getClass.getSimpleName }")
+    file.delete(true)
+    file.createDirectories()
+    file
   }
 }
