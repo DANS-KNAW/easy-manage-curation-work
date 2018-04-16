@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package nl.knaw.dans.easy.curationwork
 
 case class Deposit(bagId: BagId,
@@ -22,5 +21,3 @@ case class Deposit(bagId: BagId,
                    description: String,
                    creationTimestamp: String,
                    audience: String)
-
-
