@@ -20,7 +20,6 @@ import nl.knaw.dans.lib.logging.DebugEnhancedLogging
 
 import scala.language.postfixOps
 
-
 class EasyManageCurationWorkApp(val commonCurationDir: File, val managerCurationDirString: String) extends DebugEnhancedLogging {
 
   def getCurationDirectory(datamanager: Option[DatamanagerId]): File = {

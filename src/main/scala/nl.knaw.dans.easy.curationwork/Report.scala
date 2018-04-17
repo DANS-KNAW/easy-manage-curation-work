@@ -24,7 +24,6 @@ import scala.language.postfixOps
 import scala.util.Try
 import scala.xml.XML
 
-
 class Report(commonCurationDir: File, managerCurationDirString: String) extends EasyManageCurationWorkApp(commonCurationDir, managerCurationDirString) with DebugEnhancedLogging {
 
   def listCurationArea(dir: File): List[File] = {
@@ -42,7 +41,6 @@ class Report(commonCurationDir: File, managerCurationDirString: String) extends 
         val curationPerformed = depositProperties.getString("curation.performed") == "yes"
 
         if (submitted && curationRequired && !curationPerformed) Some {
-
           // get the bag directory; it is expected that there is exactly one directory to be found
           val bagDir = depositDir.list.toList.filter(_.isDirectory).head
 
@@ -51,7 +49,6 @@ class Report(commonCurationDir: File, managerCurationDirString: String) extends 
           val title = titles.headOption.map(_.text).getOrElse("n/a").toString
           val audiences = xml \\ "audience"
           val audience = audiences.headOption.map(_.text).getOrElse("n/a").toString
-
 
           Deposit(
             bagId = depositProperties.getString("bag-store.bag-id"),
