@@ -19,6 +19,8 @@ import better.files.File
 import nl.knaw.dans.lib.logging.DebugEnhancedLogging
 import org.apache.commons.configuration.PropertiesConfiguration
 
+import scala.annotation.tailrec
+import scala.io.StdIn
 import scala.language.postfixOps
 import scala.util.Try
 
@@ -32,14 +34,26 @@ class Assign(commonCurationDir: File, managerCurationDirString: String, datamana
     depositProperties.save()
   }
 
+  @tailrec
+  private def confirmAssigningMoreThanOneDeposit(datamanager: DatamanagerId, bagIds: List[File]): Boolean = {
+    StdIn.readLine(s"This action will move deposits ${ bagIds.map(deposit => deposit.name).mkString("[", ", ", "]") } to the personal curation area of $datamanager. OK? (y/n):") match {
+      case "y" => true
+      case "n" => false
+      case _ =>
+        println("Please enter a valid char : y or n ")
+        confirmAssigningMoreThanOneDeposit(datamanager, bagIds)
+    }
+  }
+
+
   private def assignDeposit(datamanager: DatamanagerId, personalCurationDirectory: File, deposit: File): String = {
     if (personalCurationDirectory / deposit.name exists)
-      s"\nError: Deposit ${deposit.name} already exists in the personal curation area of datamanager $datamanager"
+      s"\nError: Deposit ${ deposit.name } already exists in the personal curation area of datamanager $datamanager"
     else {
       val depositProperties = new PropertiesConfiguration(deposit / "deposit.properties" toJava)
       setProperties(depositProperties, datamanager)
       deposit moveTo personalCurationDirectory / deposit.name
-      s"\nDeposit ${deposit.name} has been assigned to datamanager $datamanager"
+      s"\nDeposit ${ deposit.name } has been assigned to datamanager $datamanager"
     }
   }
 
@@ -49,7 +63,14 @@ class Assign(commonCurationDir: File, managerCurationDirString: String, datamana
     if (bagIds.isEmpty)
       s"Error: No deposits found in the common curation area starting with $bagId"
     else {
-      bagIds.foldLeft("")((msg, deposit) => msg + assignDeposit(datamanager, personalCurationDirectory, deposit))
+      if (bagIds.isEmpty)
+        s"There were no deposits in the personal curation area of $datamanager to assign, starting with ${ bagId }"
+      else {
+        if (bagIds.size > 1 && !confirmAssigningMoreThanOneDeposit(datamanager, bagIds))
+          s"Action cancelled"
+        else
+          bagIds.foldLeft("")((msg, deposit) => msg + assignDeposit(datamanager, personalCurationDirectory, deposit))
+      }
     }
   }
 

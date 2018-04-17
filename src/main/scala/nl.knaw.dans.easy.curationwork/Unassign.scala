@@ -58,7 +58,7 @@ class Unassign(commonCurationDir: File, managerCurationDirString: String) extend
 
   @tailrec
   private def confirmUnassigningMoreThanOneDeposit(datamanager: DatamanagerId, bagIds: List[File]): Boolean = {
-    StdIn.readLine(s"This action will move deposits ${bagIds.map(deposit => deposit.name).mkString("[", ", ", "]")} from the curation area of $datamanager to the common curation area. OK? (y/n):") match {
+    StdIn.readLine(s"This action will move deposits ${ bagIds.map(deposit => deposit.name).mkString("[", ", ", "]") } from personal curation area of $datamanager to the common curation area. OK? (y/n):") match {
       case "y" => true
       case "n" => false
       case _ =>
@@ -80,7 +80,7 @@ class Unassign(commonCurationDir: File, managerCurationDirString: String) extend
     else {
       clearProperties(depositProperties)
       deposit moveTo commonCurationDir / deposit.name
-      s"\nDeposit ${deposit.name} has been unassigned from datamanager $datamanager"
+      s"\nDeposit ${ deposit.name } has been unassigned from datamanager $datamanager"
     }
   }
 
@@ -92,9 +92,9 @@ class Unassign(commonCurationDir: File, managerCurationDirString: String) extend
       case None => personalCurationDirectory.list.toList.filter(_ isDirectory)
     }
     if (bagIds.isEmpty)
-      s"There were no deposits in the personal curation area of $datamanager to unassign, starting with ${bagId.getOrElse("")}"
+      s"There were no deposits in the personal curation area of $datamanager to unassign, starting with ${ bagId.getOrElse("") }"
     else {
-      if (bagIds.size > 1  && !confirmUnassigningMoreThanOneDeposit(datamanager, bagIds))
+      if (bagIds.size > 1 && !confirmUnassigningMoreThanOneDeposit(datamanager, bagIds))
         s"Action cancelled"
       else
         bagIds.foldLeft("")((msg, deposit) => msg + unassignDeposit(deposit, datamanager))
@@ -103,10 +103,10 @@ class Unassign(commonCurationDir: File, managerCurationDirString: String) extend
 
   private def unassign(datamanager: DatamanagerId, bagId: Option[BagId]): String = {
     val curationDirectory = getCurationDirectory(Some(datamanager))
-    if (bagId.isEmpty && !confirmAction(datamanager))
-      s"Action cancelled"
-    else if (curationDirectory notExists)
+    if (curationDirectory notExists)
       s"Error: No personal curation area found for datamanager $datamanager"
+    else if (bagId.isEmpty && !confirmAction(datamanager))
+      s"Action cancelled"
     else
       unassignFromDatamanager(curationDirectory, bagId, datamanager)
   }
