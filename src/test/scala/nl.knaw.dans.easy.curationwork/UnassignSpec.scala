@@ -72,7 +72,7 @@ class UnassignSpec extends TestSupportFixture {
   "unassigning a bagId that does not (anymore) exist in the personal curation area of a datamanager" should "fail" in {
     assigner.assignCurationWork(janneke, bagId) shouldBe a[Success[_]]
     unassigner.unassignCurationWork(Some(janneke), Some(bagId)) shouldBe a[Success[_]]
-    unassigner.unassignCurationWork(Some(janneke), Some(bagId)).getOrElse("") should include(s"$bagId not found in the curation area of datamanager $janneke")
+    unassigner.unassignCurationWork(Some(janneke), Some(bagId)).getOrElse("") should include(s"There were no deposits in the personal curation area of $janneke to unassign, starting with $bagId")
   }
 
   "unassigning all deposits from a datamanager who does not yet have a personal curation area" should "fail" in {

@@ -56,49 +56,59 @@ class Unassign(commonCurationDir: File, managerCurationDirString: String) extend
     }
   }
 
+  @tailrec
+  private def confirmUnassigningMoreThanOneDeposit(datamanager: DatamanagerId, bagIds: List[File]): Boolean = {
+    StdIn.readLine(s"This action will move deposits ${ bagIds.map(deposit => deposit.name).mkString("[", ", ", "]") } from personal curation area of $datamanager to the common curation area. OK? (y/n):") match {
+      case "y" => true
+      case "n" => false
+      case _ =>
+        println("Please enter a valid char : y or n ")
+        confirmUnassigningMoreThanOneDeposit(datamanager, bagIds)
+    }
+  }
+
   private def unassignDeposit(deposit: File, datamanager: DatamanagerId): String = {
     val depositProperties = new PropertiesConfiguration(deposit / "deposit.properties" toJava)
     if (!isSubmitted(depositProperties) || isCurated(depositProperties)) {
       var msg = ""
       if (!isSubmitted(depositProperties))
-        msg = s"\nError: Deposit $deposit is not SUBMITTED. It was not unassigned."
+        msg = s"\nError: Deposit $deposit is not SUBMITTED. It was not unassigned"
       if (isCurated(depositProperties))
-        msg += s"\nError: Deposit $deposit has already been curated. It was not unassigned."
+        msg += s"\nError: Deposit $deposit has already been curated. It was not unassigned"
       msg
     }
     else {
       clearProperties(depositProperties)
       deposit moveTo commonCurationDir / deposit.name
-      s"\nDeposit ${deposit.name} has been unassigned from datamanager $datamanager."
+      s"\nDeposit ${ deposit.name } has been unassigned from datamanager $datamanager"
     }
   }
 
   private def unassignFromDatamanager(personalCurationDirectory: File, bagId: Option[BagId], datamanager: DatamanagerId): String = {
-    bagId match {
-      case Some(deposit) => unassignDeposit(personalCurationDirectory / deposit, datamanager)
-      case None =>
-        val msg = personalCurationDirectory.list.toList
-          .filter(_ isDirectory)
-          .foldLeft("")((msg, deposit) => msg + unassignDeposit(deposit, datamanager))
-
-        if (msg.isEmpty) "There were no deposits to unassign."
-        else msg
+    // It is possible to give just part of the bag-id, and then all deposits starting with that part are unassigned
+    // If no bag-id is given, then all deposits of the datamanager are unassigned
+    val bagIds = bagId match {
+      case Some(deposit) => personalCurationDirectory.list.toList.filter(file => file.isDirectory && file.name.startsWith(deposit))
+      case None => personalCurationDirectory.list.toList.filter(_ isDirectory)
+    }
+    if (bagIds.isEmpty)
+      s"There were no deposits in the personal curation area of $datamanager to unassign, starting with ${ bagId.getOrElse("") }"
+    else {
+      if (bagIds.size > 1 && !confirmUnassigningMoreThanOneDeposit(datamanager, bagIds))
+        s"Action cancelled"
+      else
+        bagIds.foldLeft("")((msg, deposit) => msg + unassignDeposit(deposit, datamanager))
     }
   }
 
   private def unassign(datamanager: DatamanagerId, bagId: Option[BagId]): String = {
     val curationDirectory = getCurationDirectory(Some(datamanager))
-    if (curationDirectory / bagId.getOrElse("") exists) {
-      if (bagId.isEmpty && !confirmAction(datamanager))
-        s"Action cancelled"
-      else
-        unassignFromDatamanager(curationDirectory, bagId, datamanager)
-    }
+    if (curationDirectory notExists)
+      s"Error: No personal curation area found for datamanager $datamanager"
+    else if (bagId.isEmpty && !confirmAction(datamanager))
+      s"Action cancelled"
     else
-      bagId match {
-        case Some(deposit) => s"Error: Deposit $deposit not found in the curation area of datamanager $datamanager."
-        case None => s"Error: No personal curation area found for datamanager $datamanager."
-      }
+      unassignFromDatamanager(curationDirectory, bagId, datamanager)
   }
 
   def unassignCurationWork(datamanager: Option[DatamanagerId] = None, bagId: Option[BagId] = None): Try[String] = Try {

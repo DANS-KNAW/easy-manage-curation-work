@@ -66,11 +66,11 @@ class AssignSpec extends TestSupportFixture {
 
   "assigning twice with the same parameters" should "fail" in {
     assigner.assignCurationWork(janneke, bagId) shouldBe a[Success[_]]
-    assigner.assignCurationWork(janneke, bagId).getOrElse("") should include(s"Deposit $bagId not found in the common curation area")
+    assigner.assignCurationWork(janneke, bagId).getOrElse("") should include(s"No deposits found in the common curation area starting with $bagId")
   }
 
   "assigning non-existing bagId" should "fail" in {
-    assigner.assignCurationWork(janneke, "non-existing-bagId").getOrElse("") should include(s"Deposit non-existing-bagId not found in the common curation area")
+    assigner.assignCurationWork(janneke, "non-existing-bagId").getOrElse("") should include(s"No deposits found in the common curation area starting with non-existing-bagId")
   }
 
   "assigning a bagId that already exists in the personal curation area of a datamanager" should "fail" in {
