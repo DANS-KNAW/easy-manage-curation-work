@@ -32,25 +32,33 @@ class Assign(commonCurationDir: File, managerCurationDirString: String, datamana
     depositProperties.save()
   }
 
-  private def assignToDatamanager(datamanager: DatamanagerId, personalCurationDirectory: File, bagId: BagId): String = {
-    if (personalCurationDirectory / bagId exists) {
-      s"\nError: Deposit $bagId already exists in the personal curation area of datamanager $datamanager."
-    }
+  private def assignDeposit(datamanager: DatamanagerId, personalCurationDirectory: File, deposit: File): String = {
+    if (personalCurationDirectory / deposit.name exists)
+      s"\nError: Deposit ${deposit.name} already exists in the personal curation area of datamanager $datamanager"
     else {
-      val depositProperties = new PropertiesConfiguration((commonCurationDir / bagId / "deposit.properties").toJava)
+      val depositProperties = new PropertiesConfiguration(deposit / "deposit.properties" toJava)
       setProperties(depositProperties, datamanager)
-      commonCurationDir / bagId moveTo personalCurationDirectory / bagId
-      s"Deposit $bagId has been assigned to datamanager $datamanager."
+      deposit moveTo personalCurationDirectory / deposit.name
+      s"\nDeposit ${deposit.name} has been assigned to datamanager $datamanager"
+    }
+  }
+
+  private def assignToDatamanager(datamanager: DatamanagerId, personalCurationDirectory: File, bagId: BagId): String = {
+    // It is possible to give just part of the bag-id, and then all deposits starting with that part are assigned
+    val bagIds = commonCurationDir.list.toList.filter(file => file.isDirectory && file.name.startsWith(bagId))
+    if (bagIds.isEmpty)
+      s"Error: No deposits found in the common curation area starting with $bagId"
+    else {
+      bagIds.foldLeft("")((msg, deposit) => msg + assignDeposit(datamanager, personalCurationDirectory, deposit))
     }
   }
 
   def assignCurationWork(datamanager: DatamanagerId, bagId: BagId): Try[String] = Try {
     val curationDirectory = getCurationDirectory(Some(datamanager))
-    if (commonCurationDir / bagId exists) {
-      if (curationDirectory exists)
-        assignToDatamanager(datamanager, curationDirectory, bagId)
-      else s"Error: No personal curation area found for datamanager $datamanager."
+    if (curationDirectory exists) {
+      assignToDatamanager(datamanager, curationDirectory, bagId)
     }
-    else s"Error: Deposit $bagId not found in the common curation area."
+    else
+      s"\nError: No personal curation area found for datamanager $datamanager"
   }
 }
