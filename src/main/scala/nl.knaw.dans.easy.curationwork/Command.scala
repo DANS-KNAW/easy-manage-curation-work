@@ -44,19 +44,26 @@ object Command extends App with DebugEnhancedLogging {
     .doIfFailure { case NonFatal(e) => println(s"FAILED: ${ e.getMessage }") }
 
   private def runSubcommand(): Try[FeedBackMessage] = {
-    commandLine.subcommand
-      .collect {
-        case cmd @ commandLine.list =>
-          if (validDatamanager(cmd.datamanager.toOption)) reporter.listCurationWork(cmd.datamanager.toOption)
-          else Try(s"Error: Unknown datamanager ${ cmd.datamanager() } (missing in datamanager properties file)")
-        case cmd @ commandLine.assign =>
-          if (userIdAndEmailExist(cmd.datamanager())) assigner.assignCurationWork(cmd.datamanager(), cmd.bagId())
-          else Try(s"Error: Easy-userid and/or email address of datamanager ${ cmd.datamanager() } missing in datamanager properties file")
-        case cmd @ commandLine.unassign =>
-          if (validDatamanager(cmd.datamanager.toOption)) unassigner.unassignCurationWork(cmd.datamanager.toOption, cmd.bagId.toOption)
-          else Try(s"Unknown datamanager ${ cmd.datamanager() } (missing in datamanager properties file)")
-      }
-      .getOrElse(Failure(new IllegalArgumentException(s"Unknown command: ${ commandLine.subcommand }")))
+    if (!commonCurationAreaExists)
+      Try(s"Error: No common curation area found.")
+    else
+      commandLine.subcommand
+        .collect {
+          case cmd @ commandLine.list =>
+            if (validDatamanager(cmd.datamanager.toOption)) reporter.listCurationWork(cmd.datamanager.toOption)
+            else Try(s"Error: Unknown datamanager ${ cmd.datamanager() } (missing in datamanager properties file)")
+          case cmd @ commandLine.assign =>
+            if (userIdAndEmailExist(cmd.datamanager())) assigner.assignCurationWork(cmd.datamanager(), cmd.bagId())
+            else Try(s"Error: Easy-userid and/or email address of datamanager ${ cmd.datamanager() } missing in datamanager properties file")
+          case cmd @ commandLine.unassign =>
+            if (validDatamanager(cmd.datamanager.toOption)) unassigner.unassignCurationWork(cmd.datamanager.toOption, cmd.bagId.toOption)
+            else Try(s"Unknown datamanager ${ cmd.datamanager() } (missing in datamanager properties file)")
+        }
+        .getOrElse(Failure(new IllegalArgumentException(s"Unknown command: ${ commandLine.subcommand }")))
+  }
+
+  private def commonCurationAreaExists(): Boolean = {
+    commonCurationArea.exists
   }
 
   private def userIdAndEmailExist(datamanager: DatamanagerId): Boolean = {
