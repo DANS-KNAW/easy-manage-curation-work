@@ -16,11 +16,14 @@
 #
 
 DATADIR=data
-DATAMANAGER_CURATION_AREAS=data/datamanager-curation-areas
+EASY_COMMON_CURATION_AREA=$DATADIR/easy-common-curation-area
+DATAMANAGER_CURATION_AREAS=$DATADIR/datamanager-curation-areas
 
 echo "Pre-creating log..."
 touch $DATADIR/easy-manage-curation-work.log
 
+echo "Delete test data from $EASY_COMMON_CURATION_AREA..."
+rm -r ${EASY_COMMON_CURATION_AREA}
 echo "Delete test data from $DATAMANAGER_CURATION_AREAS..."
 rm -r ${DATAMANAGER_CURATION_AREAS}
 
