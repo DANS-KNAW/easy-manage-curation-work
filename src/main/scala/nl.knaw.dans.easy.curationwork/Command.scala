@@ -44,7 +44,7 @@ object Command extends App with DebugEnhancedLogging {
     .doIfFailure { case NonFatal(e) => println(s"FAILED: ${ e.getMessage }") }
 
   private def runSubcommand(): Try[FeedBackMessage] = {
-    if (!commonCurationAreaExists)
+    if (!commonCurationArea.exists)
       Try(s"Error: No common curation area found.")
     else
       commandLine.subcommand
@@ -60,10 +60,6 @@ object Command extends App with DebugEnhancedLogging {
             else Try(s"Unknown datamanager ${ cmd.datamanager() } (missing in datamanager properties file)")
         }
         .getOrElse(Failure(new IllegalArgumentException(s"Unknown command: ${ commandLine.subcommand }")))
-  }
-
-  private def commonCurationAreaExists(): Boolean = {
-    commonCurationArea.exists
   }
 
   private def userIdAndEmailExist(datamanager: DatamanagerId): Boolean = {
